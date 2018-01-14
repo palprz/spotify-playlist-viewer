@@ -8,14 +8,14 @@ function login() {
   window.location = url;
 }
 
-// TODO
-// https://stackoverflow.com/questions/3458553/javascript-passing-parameters-to-a-callback-function
-function getAPIResponse(url, accessToken) {
-  return $.ajax({
+function getAPIResponse(url, accessToken, callback) {
+  $.ajax({
     url: url,
     headers: {
       'Authorization': 'Bearer ' + accessToken
     }
+  }).done(function(response) {
+    callback(response);
   });
 }
 
@@ -56,12 +56,13 @@ function Artist(id, name, albums) {
     var folder = new Folder('General', {});
 
     // Get User ID
-    getAPIResponse('https://api.spotify.com/v1/me', accessToken).then(function(response) {
+    getAPIResponse('https://api.spotify.com/v1/me', accessToken, function(response) {
       var userId = response.id;
 
-      // TODO this will check only 20 lists -> needs to check minimum 50
+      // TODO check more than 50 playlists
       // Get playlists
-      getAPIResponse('https://api.spotify.com/v1/me/playlists', accessToken).then(function(response) {
+      getAPIResponse('https://api.spotify.com/v1/me/playlists?limit=50', accessToken, function(response) {
+        console.log(response.items);
         var playlists = {};
         response.items.forEach(function(playlist) {
           playlists[playlist.id] = playlist.name;
@@ -72,7 +73,7 @@ function Artist(id, name, albums) {
           var url = 'https://api.spotify.com/v1/users/' + userId + '/playlists/' + key + '/tracks';
 
           // Get tracks
-          getAPIResponse(url, accessToken).then(function(response) {
+          getAPIResponse(url, accessToken, function(response) {
             response.items.forEach(function(item) {
               var albumId = item.track.album.id;
               var albumName = item.track.album.name;
@@ -99,7 +100,7 @@ function Artist(id, name, albums) {
               }
             });
           });
-
+           console.log('dupa1');
           // TODO add folder to folders
         }
       });
