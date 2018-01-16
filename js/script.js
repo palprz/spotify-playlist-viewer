@@ -8,14 +8,12 @@ function login() {
   window.location = url;
 }
 
-function getAPIResponse(url, accessToken, callback) {
-  $.ajax({
+function getAPIResponse(url, accessToken) {
+  return $.getJSON({
     url: url,
     headers: {
       'Authorization': 'Bearer ' + accessToken
     }
-  }).done(function(response) {
-    callback(response);
   });
 }
 
@@ -36,18 +34,15 @@ function Artist(id, name, albums) {
 }
 
 (function() {
-
   // Get parameters from URL
   var vars = window.location.hash.substring(1).split('&');
-  var key = {};
-  for (i = 0; i < vars.length; i++) {
-    var tmp = vars[i].split('=');
-    key[tmp[0]] = tmp[1];
+  var accessToken;
+  if (vars.length > 0) {
+    accessToken = vars[0].split('=')[1];
   }
 
-  if (typeof key['access_token'] !== 'undefined') {
+  if (accessToken !== undefined) {
     // var folders = {};
-    var accessToken = key['access_token'];
     $('#login').css('display', 'none');
     $('.progress').css('display', 'block');
 
@@ -55,26 +50,32 @@ function Artist(id, name, albums) {
     // var generalFolder = new Folder('General', {});
     var folder = new Folder('General', {});
 
-    // Get User ID
-    getAPIResponse('https://api.spotify.com/v1/me', accessToken, function(response) {
+    // Get user
+    var getUser = getAPIResponse('https://api.spotify.com/v1/me', accessToken);
+
+    getUser.done(function(response) {
       var userId = response.id;
 
-      // TODO check more than 50 playlists
       // Get playlists
-      getAPIResponse('https://api.spotify.com/v1/me/playlists?limit=50', accessToken, function(response) {
-        console.log(response.items);
+      var playlistsResponse = getAPIResponse('https://api.spotify.com/v1/me/playlists?limit=50', accessToken);
+
+      playlistsResponse.done(function(response) {
         var playlists = {};
         response.items.forEach(function(playlist) {
           playlists[playlist.id] = playlist.name;
         });
 
-        // TODO callback...
+        var promises = [];
         for ( var key in playlists) {
           var url = 'https://api.spotify.com/v1/users/' + userId + '/playlists/' + key + '/tracks';
+          promises.push(getAPIResponse(url, accessToken));
+        }
 
-          // Get tracks
-          getAPIResponse(url, accessToken, function(response) {
-            response.items.forEach(function(item) {
+        // Get tracks
+        Promise.all(promises).then(function() {
+          var response = arguments[0];
+          for ( var index in response) {
+            response[index].items.forEach(function(item) {
               var albumId = item.track.album.id;
               var albumName = item.track.album.name;
 
@@ -99,10 +100,11 @@ function Artist(id, name, albums) {
                 }
               }
             });
-          });
-           console.log('dupa1');
-          // TODO add folder to folders
-        }
+          }
+
+          console.log(folder);
+          // callback(folder);
+        });
       });
     });
 
