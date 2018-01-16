@@ -1,6 +1,6 @@
 function login() {
   var client_id = 'c676b1cde38a4bf9a725cafebeab4c69';
-  var redirect_uri = 'http://localhost:63342/spotify/index.html';
+  var redirect_uri = 'https://rawgit.com/palprz/spotify-playlist-viewer/master/index.html';
 
   var url = 'https://accounts.spotify.com/authorize?client_id=' + client_id + '&redirect_uri=' + redirect_uri
           + '&scope=playlist-read-private&response_type=token';

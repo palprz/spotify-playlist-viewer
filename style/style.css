@@ -87,3 +87,11 @@ i i:hover {
 	/* TODO take something interesting from CSS framework */
 	display: block;
 }
+
+nav {
+	height: 120px;
+}
+
+.nav-wrapper a {
+	top: -40px;
+}
