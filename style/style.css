@@ -92,6 +92,10 @@ nav {
 	height: 120px;
 }
 
-.nav-wrapper a {
+.nav-wrapper img {
 	top: -40px;
+}
+
+.utils {
+	display: none;
 }

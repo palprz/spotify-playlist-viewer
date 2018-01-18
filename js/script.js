@@ -92,11 +92,11 @@ function Artist(id, name, albums) {
                 folder.artists[artistId] = artist;
               } else {
                 // There is artist
-                var artist = folder.artists[artistId];
-                if (typeof artist.albums[albumId] === 'undefined') {
+                var foundArtist = folder.artists[artistId];
+                if (typeof foundArtist.albums[albumId] === 'undefined') {
                   // No album
-                  var album = new Album(albumId, albumName);
-                  artist.albums[albumId] = album;
+                  var newAlbum = new Album(albumId, albumName);
+                  foundArtist.albums[albumId] = newAlbum;
                 }
               }
             });
@@ -112,11 +112,11 @@ function Artist(id, name, albums) {
     setTimeout(function() {
       // console.log('test');
       // console.log(folders);
-      var html = '<ul class="card">'
+      var html = '<ul class="card">';
       // for ( var folder in folders) {
       html += '<li><i class="expand-collapse material-icons">expand_less</i><span>' + folder.name + '</span><ul>';
       for ( var key in folder.artists) {
-        var artist = folder.artists[key]
+        var artist = folder.artists[key];
         html += '<li><i class="expand-collapse material-icons">expand_less</i><span><a href="spotify:artist:'
                 + artist.id + '">' + artist.name + '</a></span><ul>';
         for ( var keyAlbum in artist.albums) {
@@ -130,10 +130,12 @@ function Artist(id, name, albums) {
       html += '</ul>';
 
       $('.progress').css('display', 'none');
+      $('.utils').css('display', 'block');
       $('#result').html(html);
     }, 1000);
   } else {
     $('.progress').css('display', 'none');
+    $('.utils').css('display', 'none');
   }
 
   $(document).on('click', '#login', function() {

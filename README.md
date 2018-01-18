@@ -1,4 +1,4 @@
-# Spotify Playlist View [January 2018]
+# Spotify Playlist Viewer [January 2018]
 
 Simple web application for displaying playlists in different way than Spotify.
 
