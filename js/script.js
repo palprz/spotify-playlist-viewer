@@ -17,6 +17,31 @@ function getAPIResponse(url, accessToken) {
   });
 }
 
+function displayResult(folder) {
+  // console.log('test');
+  // console.log(folders);
+  var html = '<ul class="card">';
+  // for ( var folder in folders) {
+  html += '<li><i class="expand-collapse material-icons">expand_less</i><span>' + folder.name + '</span><ul>';
+  for ( var key in folder.artists) {
+    var artist = folder.artists[key];
+    html += '<li><i class="expand-collapse material-icons">expand_less</i><span><a href="spotify:artist:' + artist.id
+            + '">' + artist.name + '</a></span><ul>';
+    for ( var keyAlbum in artist.albums) {
+      var album = artist.albums[keyAlbum];
+      html += '<li><span><a href="spotify:album:' + album.id + '">' + album.name + '</a></span></li>';
+    }
+    html += '</ul></li>';
+  }
+  html += '</li>';
+  // }
+  html += '</ul>';
+
+  $('.progress').css('display', 'none');
+  $('.utils').css('display', 'block');
+  $('#result').html(html);
+}
+
 function Folder(name, artists) {
   this.name = name;
   this.artists = artists;
@@ -102,37 +127,12 @@ function Artist(id, name, albums) {
             });
           }
 
-          console.log(folder);
-          // callback(folder);
+          return folder;
+        }).then(function(folder) {
+          displayResult(folder);
         });
       });
     });
-
-    // Display response
-    setTimeout(function() {
-      // console.log('test');
-      // console.log(folders);
-      var html = '<ul class="card">';
-      // for ( var folder in folders) {
-      html += '<li><i class="expand-collapse material-icons">expand_less</i><span>' + folder.name + '</span><ul>';
-      for ( var key in folder.artists) {
-        var artist = folder.artists[key];
-        html += '<li><i class="expand-collapse material-icons">expand_less</i><span><a href="spotify:artist:'
-                + artist.id + '">' + artist.name + '</a></span><ul>';
-        for ( var keyAlbum in artist.albums) {
-          var album = artist.albums[keyAlbum];
-          html += '<li><span><a href="spotify:album:' + album.id + '">' + album.name + '</a></span></li>';
-        }
-        html += '</ul></li>';
-      }
-      html += '</li>';
-      // }
-      html += '</ul>';
-
-      $('.progress').css('display', 'none');
-      $('.utils').css('display', 'block');
-      $('#result').html(html);
-    }, 1000);
   } else {
     $('.progress').css('display', 'none');
     $('.utils').css('display', 'none');
