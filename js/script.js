@@ -1,3 +1,54 @@
+function Folder(name, artists) {
+  this.name = name;
+  this.artists = artists;
+}
+
+function Album(id, name) {
+  this.id = id;
+  this.name = name;
+}
+
+function Artist(id, name, albums) {
+  this.id = id;
+  this.name = name;
+  this.albums = albums;
+}
+
+function initBasicAnimation() {
+  $(document).on('click', '#login', function() {
+    console.log('Start login...');
+    $('.progress').css('display', 'block');
+    login();
+  });
+
+  $(document).on('click', '.expand-collapse', function() {
+    var $children = $(this).parent().children('ul');
+    var val = $children.css('display');
+    if (val === 'none') {
+      $(this).text('expand_less');
+    } else {
+      $(this).text('expand_more');
+    }
+    $children.animate({
+      height: 'toggle'
+    });
+  });
+
+  $(document).on('click', '.expand-all', function() {
+    console.log('show...');
+    $('.card').find('ul').animate({
+      height: 'show'
+    });
+  });
+
+  $(document).on('click', '.collapse-all', function() {
+    console.log('hide...');
+    $('.card').find('ul').animate({
+      height: 'hide'
+    });
+  });
+}
+
 function login() {
   var client_id = 'c676b1cde38a4bf9a725cafebeab4c69';
   var redirect_uri = 'https://rawgit.com/palprz/spotify-playlist-viewer/master/index.html';
@@ -18,11 +69,7 @@ function getAPIResponse(url, accessToken) {
 }
 
 function displayResult(folder) {
-  // console.log('test');
-  // console.log(folders);
-  var html = '<ul class="card">';
-  // for ( var folder in folders) {
-  html += '<li><i class="expand-collapse material-icons">expand_less</i><span>' + folder.name + '</span><ul>';
+  var html = '<ul class="card"><li><i class="expand-collapse material-icons">expand_less</i><span>' + folder.name + '</span><ul>';
   for ( var key in folder.artists) {
     var artist = folder.artists[key];
     html += '<li><i class="expand-collapse material-icons">expand_less</i><span><a href="spotify:artist:' + artist.id
@@ -33,29 +80,11 @@ function displayResult(folder) {
     }
     html += '</ul></li>';
   }
-  html += '</li>';
-  // }
-  html += '</ul>';
+  html += '</li></ul>';
 
   $('.progress').css('display', 'none');
   $('.utils').css('display', 'block');
   $('#result').html(html);
-}
-
-function Folder(name, artists) {
-  this.name = name;
-  this.artists = artists;
-}
-
-function Album(id, name) {
-  this.id = id;
-  this.name = name;
-}
-
-function Artist(id, name, albums) {
-  this.id = id;
-  this.name = name;
-  this.albums = albums;
 }
 
 async function getPlaylists(accessToken, limit) {
@@ -153,37 +182,6 @@ async function getAllPlaylists(accessToken, limit) {
     $('.utils').css('display', 'none');
   }
 
-  $(document).on('click', '#login', function() {
-    console.log('Start login...');
-    $('.progress').css('display', 'block');
-    login();
-  });
-
-  $(document).on('click', '.expand-collapse', function() {
-    var $children = $(this).parent().children('ul');
-    var val = $children.css('display');
-    if (val === 'none') {
-      $(this).text('expand_less');
-    } else {
-      $(this).text('expand_more');
-    }
-    $children.animate({
-      height: 'toggle'
-    });
-  });
-
-  $(document).on('click', '.expand-all', function() {
-    console.log('show...');
-    $('.card').find('ul').animate({
-      height: 'show'
-    });
-  });
-
-  $(document).on('click', '.collapse-all', function() {
-    console.log('hide...');
-    $('.card').find('ul').animate({
-      height: 'hide'
-    });
-  });
-
+  initBasicAnimation();
+  
 })();
