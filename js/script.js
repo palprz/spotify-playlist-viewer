@@ -58,6 +58,31 @@ function Artist(id, name, albums) {
   this.albums = albums;
 }
 
+async function getPlaylists(accessToken, limit) {
+  var playlistsResponse = await getAPIResponse('https://api.spotify.com/v1/me/playlists?limit=' + limit, accessToken);
+  return playlistsResponse;
+}
+
+async function getUserId(accessToken) {
+  var userResponse = await getAPIResponse('https://api.spotify.com/v1/me', accessToken);
+  return userResponse.id;
+}
+
+async function getAllPlaylists(accessToken, limit) {
+  var isSomethingLeft = true;
+  var limit = 50;
+  while (isSomethingLeft) {
+    var playlists = await getPlaylists(accessToken, limit);
+    if (playlists.items.length !== limit) {
+      isSomethingLeft = false;
+    } else {
+      limit += 50;
+    }
+  }
+
+  return playlists.items;
+}
+
 (function() {
   // Get parameters from URL
   var vars = window.location.hash.substring(1).split('&');
@@ -75,32 +100,23 @@ function Artist(id, name, albums) {
     // var generalFolder = new Folder('General', {});
     var folder = new Folder('General', {});
 
-    // Get user
-    var getUser = getAPIResponse('https://api.spotify.com/v1/me', accessToken);
+    getAllPlaylists(accessToken, 10).then(function(playlists) {
+      var mapPlaylists = {};
+      playlists.forEach(function(playlist) {
+        mapPlaylists[playlist.id] = playlist.name;
+      });
 
-    getUser.done(function(response) {
-      var userId = response.id;
-
-      // Get playlists
-      var playlistsResponse = getAPIResponse('https://api.spotify.com/v1/me/playlists?limit=50', accessToken);
-
-      playlistsResponse.done(function(response) {
-        var playlists = {};
-        response.items.forEach(function(playlist) {
-          playlists[playlist.id] = playlist.name;
-        });
-
+      getUserId(accessToken).then(function(userId) {
         var promises = [];
-        for ( var key in playlists) {
+        for ( var key in mapPlaylists) {
           var url = 'https://api.spotify.com/v1/users/' + userId + '/playlists/' + key + '/tracks';
           promises.push(getAPIResponse(url, accessToken));
         }
 
-        // Get tracks
         Promise.all(promises).then(function() {
           var response = arguments[0];
-          for ( var index in response) {
-            response[index].items.forEach(function(item) {
+          for (var i = 0; i < response.length; i++) {
+            response[i].items.forEach(function(item) {
               var albumId = item.track.album.id;
               var albumName = item.track.album.name;
 
@@ -126,7 +142,6 @@ function Artist(id, name, albums) {
               }
             });
           }
-
           return folder;
         }).then(function(folder) {
           displayResult(folder);
