@@ -35,14 +35,12 @@ function initBasicAnimation() {
   });
 
   $(document).on('click', '.expand-all', function() {
-    console.log('show...');
     $('.card').find('ul').animate({
       height: 'show'
     });
   });
 
   $(document).on('click', '.collapse-all', function() {
-    console.log('hide...');
     $('.card').find('ul').animate({
       height: 'hide'
     });
@@ -87,8 +85,8 @@ function displayResult(folder) {
   $('#result').html(html);
 }
 
-async function getPlaylists(accessToken, limit) {
-  var playlistsResponse = await getAPIResponse('https://api.spotify.com/v1/me/playlists?limit=' + limit, accessToken);
+async function getPlaylists(accessToken, offset) {
+  var playlistsResponse = await getAPIResponse('https://api.spotify.com/v1/me/playlists?limit=50&offset=' + offset, accessToken);
   return playlistsResponse;
 }
 
@@ -97,22 +95,32 @@ async function getUserId(accessToken) {
   return userResponse.id;
 }
 
-async function getAllPlaylists(accessToken, limit) {
+async function getAllPlaylists(accessToken) {
   var isSomethingLeft = true;
-  var limit = 50;
+  var offset = 0;
+  var playlistItems = [];
   while (isSomethingLeft) {
-    var playlists = await getPlaylists(accessToken, limit);
-    if (playlists.items.length !== limit) {
-      isSomethingLeft = false;
+    var response = await getPlaylists(accessToken, offset);
+    playlistItems.push(response);
+    //50 -> max number of lists to get from response
+    if (response.items.length === 50) {
+      offset += 50;
     } else {
-      limit += 50;
+      isSomethingLeft = false;
     }
   }
+  
+  var playlists = [];
+  for(var i = 0; i < playlistItems.length; i++) {
+    playlists.push(...playlistItems[i].items);
+  }
 
-  return playlists.items;
+  return playlists;
 }
 
 (function() {
+  initBasicAnimation();
+  
   // Get parameters from URL
   var vars = window.location.hash.substring(1).split('&');
   var accessToken;
@@ -129,7 +137,7 @@ async function getAllPlaylists(accessToken, limit) {
     // var generalFolder = new Folder('General', {});
     var folder = new Folder('General', {});
 
-    getAllPlaylists(accessToken, 10).then(function(playlists) {
+    getAllPlaylists(accessToken).then(function(playlists) {
       var mapPlaylists = {};
       playlists.forEach(function(playlist) {
         mapPlaylists[playlist.id] = playlist.name;
@@ -181,7 +189,4 @@ async function getAllPlaylists(accessToken, limit) {
     $('.progress').css('display', 'none');
     $('.utils').css('display', 'none');
   }
-
-  initBasicAnimation();
-  
 })();
