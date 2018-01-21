@@ -66,6 +66,16 @@ function getAPIResponse(url, accessToken) {
   });
 }
 
+async function getPlaylists(accessToken, offset) {
+  var playlistsResponse = await getAPIResponse('https://api.spotify.com/v1/me/playlists?limit=50&offset=' + offset, accessToken);
+  return playlistsResponse;
+}
+
+async function getUserId(accessToken) {
+  var userResponse = await getAPIResponse('https://api.spotify.com/v1/me', accessToken);
+  return userResponse.id;
+}
+
 function displayResult(folder) {
   var html = '<ul class="card"><li><i class="expand-collapse material-icons">expand_less</i><span>' + folder.name + '</span><ul>';
   folder.artists.forEach(function(artist) {
@@ -81,16 +91,6 @@ function displayResult(folder) {
   $('.progress').css('display', 'none');
   $('.utils').css('display', 'block');
   $('#result').html(html);
-}
-
-async function getPlaylists(accessToken, offset) {
-  var playlistsResponse = await getAPIResponse('https://api.spotify.com/v1/me/playlists?limit=50&offset=' + offset, accessToken);
-  return playlistsResponse;
-}
-
-async function getUserId(accessToken) {
-  var userResponse = await getAPIResponse('https://api.spotify.com/v1/me', accessToken);
-  return userResponse.id;
 }
 
 async function getAllPlaylists(accessToken) {
@@ -139,6 +139,37 @@ function sortMapByValue(array) {
   return new Map(sortedArray.map(obj => [obj[0], obj[1]]));
 }
 
+function populateTracksFromResponse(folder, response) {
+  for (var i = 0; i < response.length; i++) {
+    response[i].items.forEach(function(item) {
+      var albumId = item.track.album.id;
+      var albumName = item.track.album.name;
+
+      var artistId = item.track.artists[0].id;
+      var artistName = item.track.artists[0].name;
+
+      // Find artist
+      if (typeof folder.artists.get(artistId) === 'undefined') {
+        // No artist means no album
+        var album = new Album(albumId, albumName);
+        
+        var map = new Map();
+        map.set(albumId, album);
+        var artist = new Artist(artistId, artistName, map);
+        folder.artists.set(artistId, artist);
+      } else {
+        // There is artist
+        var foundArtist = folder.artists.get(artistId);
+        if (typeof foundArtist.albums.get(albumId) === 'undefined') {
+          // No album
+          var newAlbum = new Album(albumId, albumName);
+          foundArtist.albums.set(albumId, newAlbum);
+        }
+      }
+    });
+  } 
+}
+
 (function() {
   initBasicAnimation();
   
@@ -172,35 +203,7 @@ function sortMapByValue(array) {
         }
 
         Promise.all(promises).then(function() {
-          var response = arguments[0];
-          for (var i = 0; i < response.length; i++) {
-            response[i].items.forEach(function(item) {
-              var albumId = item.track.album.id;
-              var albumName = item.track.album.name;
-
-              var artistId = item.track.artists[0].id;
-              var artistName = item.track.artists[0].name;
-
-              // Find artist
-              if (typeof folder.artists.get(artistId) === 'undefined') {
-                // No artist means no album
-                var album = new Album(albumId, albumName);
-                
-                var map = new Map();
-                map.set(albumId, album);
-                var artist = new Artist(artistId, artistName, map);
-                folder.artists.set(artistId, artist);
-              } else {
-                // There is artist
-                var foundArtist = folder.artists.get(artistId);
-                if (typeof foundArtist.albums.get(albumId) === 'undefined') {
-                  // No album
-                  var newAlbum = new Album(albumId, albumName);
-                  foundArtist.albums.set(albumId, newAlbum);
-                }
-              }
-            });
-          }
+          populateTracksFromResponse(folder, arguments[0]);
           return folder;
         }).then(function(folder) {
           sortFolder(folder);
