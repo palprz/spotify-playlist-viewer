@@ -76,17 +76,20 @@ async function getUserId(accessToken) {
   return userResponse.id;
 }
 
-function displayResult(folder) {
-  var html = '<ul class="card"><li><i class="expand-collapse material-icons">expand_less</i><span>' + folder.name + '</span><ul>';
-  folder.artists.forEach(function(artist) {
-    html += '<li><i class="expand-collapse material-icons">expand_less</i><span><a href="spotify:artist:' + artist.id
-            + '">' + artist.name + '</a></span><ul>';
-    artist.albums.forEach(function(album) {
-      html += '<li><span><a href="spotify:album:' + album.id + '">' + album.name + '</a></span></li>';
+function displayResult(folders) {
+  var html = '<ul class="card">';
+  folders.forEach(function(folder) {
+    html += '<li><i class="expand-collapse material-icons">expand_less</i><span>' + folder.name + '</span><ul>';
+    folder.artists.forEach(function(artist) {
+      html += '<li><i class="expand-collapse material-icons">expand_less</i><span><a href="spotify:artist:' + artist.id
+              + '">' + artist.name + '</a></span><ul>';
+      artist.albums.forEach(function(album) {
+        html += '<li><span><a href="spotify:album:' + album.id + '">' + album.name + '</a></span></li>';
+      });
+      html += '</ul></li>';
     });
-    html += '</ul></li>';
+    html += '</li></ul>';
   });
-  html += '</li></ul>';
 
   $('.progress').css('display', 'none');
   $('.utils').css('display', 'block');
@@ -116,10 +119,12 @@ async function getAllPlaylists(accessToken) {
   return playlists;
 }
 
-function sortFolder(folder) {
-  folder.artists= sortMapByValue([...folder.artists]);
-  folder.artists.forEach(function(artist) {
-    artist.albums= sortMapByValue([...artist.albums]);
+function sortFolders(folders) {
+  folders.forEach(function(folder) {
+    folder.artists= sortMapByValue([...folder.artists]);
+    folder.artists.forEach(function(artist) {
+      artist.albums= sortMapByValue([...artist.albums]);
+    });
   });
 }
 
@@ -139,8 +144,33 @@ function sortMapByValue(array) {
   return new Map(sortedArray.map(obj => [obj[0], obj[1]]));
 }
 
-function populateTracksFromResponse(folder, response) {
+function getCorrectFolder(folders, playlists, i) {
+  var folder;
+  if(playlists[i].name.includes('::') ) { //TODO add configuration for this
+    var folderNameToFind = playlists[i].name.split('::')[0];
+    console.log('blah: ' + folderNameToFind);
+    if(folders.get(folderNameToFind) === 'undefined') { //TODO wut?
+      console.log(folderNameToFind);
+      //Use existing folder
+      folder = folders.get(folderNameToFind);
+    } else {
+      //Create new folder
+      folder = new Folder(folderNameToFind, new Map());
+      folders.set(folder.name, folder);
+    }
+  } else {
+    //Use general
+    folder = folders.get('General');
+  }
+  
+  return folder;
+}
+
+function populateTracksFromResponse(folders, playlists, response) {
   for (var i = 0; i < response.length; i++) {
+    
+    var folder = getCorrectFolder(folders, playlists, i);
+    
     response[i].items.forEach(function(item) {
       var albumId = item.track.album.id;
       var albumName = item.track.album.name;
@@ -181,13 +211,12 @@ function populateTracksFromResponse(folder, response) {
   }
 
   if (accessToken !== undefined) {
-    // var folders = {};
     $('#login').css('display', 'none');
     $('.progress').css('display', 'block');
 
-    // TODO create folder
-    // var generalFolder = new Folder('General', {});
+    var folders = new Map();
     var folder = new Folder('General', new Map());
+    folders.set(folder.name, folder);
 
     getAllPlaylists(accessToken).then(function(playlists) {
       var mapPlaylists = {};
@@ -203,11 +232,10 @@ function populateTracksFromResponse(folder, response) {
         }
 
         Promise.all(promises).then(function() {
-          populateTracksFromResponse(folder, arguments[0]);
-          return folder;
-        }).then(function(folder) {
-          sortFolder(folder);
-          displayResult(folder);
+          populateTracksFromResponse(folders, playlists, arguments[0]);
+        }).then(function() {
+          sortFolders(folders);
+          displayResult(folders);
         });
       });
     });
