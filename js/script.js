@@ -68,16 +68,14 @@ function getAPIResponse(url, accessToken) {
 
 function displayResult(folder) {
   var html = '<ul class="card"><li><i class="expand-collapse material-icons">expand_less</i><span>' + folder.name + '</span><ul>';
-  for ( var key in folder.artists) {
-    var artist = folder.artists[key];
+  folder.artists.forEach(function(artist) {
     html += '<li><i class="expand-collapse material-icons">expand_less</i><span><a href="spotify:artist:' + artist.id
             + '">' + artist.name + '</a></span><ul>';
-    for ( var keyAlbum in artist.albums) {
-      var album = artist.albums[keyAlbum];
+    artist.albums.forEach(function(album) {
       html += '<li><span><a href="spotify:album:' + album.id + '">' + album.name + '</a></span></li>';
-    }
+    });
     html += '</ul></li>';
-  }
+  });
   html += '</li></ul>';
 
   $('.progress').css('display', 'none');
@@ -118,6 +116,29 @@ async function getAllPlaylists(accessToken) {
   return playlists;
 }
 
+function sortFolder(folder) {
+  folder.artists= sortMapByValue([...folder.artists]);
+  folder.artists.forEach(function(artist) {
+    artist.albums= sortMapByValue([...artist.albums]);
+  });
+}
+
+function sortMapByValue(array) {
+  var sortedArray = array.sort(function(a,b) {
+    if(a[1].name > b[1].name) {
+      return 1;
+    }
+
+    if(a[1].name < b[1].name) {
+      return -1;
+    }
+    
+    return 0;
+  });
+
+  return new Map(sortedArray.map(obj => [obj[0], obj[1]]));
+}
+
 (function() {
   initBasicAnimation();
   
@@ -135,7 +156,7 @@ async function getAllPlaylists(accessToken) {
 
     // TODO create folder
     // var generalFolder = new Folder('General', {});
-    var folder = new Folder('General', {});
+    var folder = new Folder('General', new Map());
 
     getAllPlaylists(accessToken).then(function(playlists) {
       var mapPlaylists = {};
@@ -161,26 +182,28 @@ async function getAllPlaylists(accessToken) {
               var artistName = item.track.artists[0].name;
 
               // Find artist
-              if (typeof folder.artists[artistId] === 'undefined') {
+              if (typeof folder.artists.get(artistId) === 'undefined') {
                 // No artist means no album
                 var album = new Album(albumId, albumName);
-                var map = {};
-                map[albumId] = album;
+                
+                var map = new Map();
+                map.set(albumId, album);
                 var artist = new Artist(artistId, artistName, map);
-                folder.artists[artistId] = artist;
+                folder.artists.set(artistId, artist);
               } else {
                 // There is artist
-                var foundArtist = folder.artists[artistId];
-                if (typeof foundArtist.albums[albumId] === 'undefined') {
+                var foundArtist = folder.artists.get(artistId);
+                if (typeof foundArtist.albums.get(albumId) === 'undefined') {
                   // No album
                   var newAlbum = new Album(albumId, albumName);
-                  foundArtist.albums[albumId] = newAlbum;
+                  foundArtist.albums.set(albumId, newAlbum);
                 }
               }
             });
           }
           return folder;
         }).then(function(folder) {
+          sortFolder(folder);
           displayResult(folder);
         });
       });
