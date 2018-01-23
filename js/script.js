@@ -71,6 +71,20 @@ function getAPIResponse(url, accessToken) {
     headers: {
       'Authorization': 'Bearer ' + accessToken
     }
+  }).fail(function(jqXHR, textStatus, errorThrown) {
+    var status = jqXHR.status;
+    if(status === 401) {
+      // TODO create something more fancy than that
+      $('#result').html('<b style="font-size: 72px">Ooops!</b><p>There was a problem with authorize your session (calm down - probably it just expired).</p><p>Please click magic button with text "LOGIN" and you will fix this problem.</p>');
+      $('.progress').css('display', 'none');
+      $('.utils').css('display', 'none');
+      $('#login').css('display', 'block');
+    } else {
+      $('#result').html('<p> <b style="font-size: 72px">:(</b></p><p>Something terrible wrong happend!</p><p>If you are not angry enough after this error to close this page, please send me details from console browser in new issue which you can create on the <a href="https://github.com/palprz/spotify-playlist-viewer/issues">Github</a>. I will be happy to help you with it!</p>');
+      $('.progress').css('display', 'none');
+      $('.utils').css('display', 'none');
+      $('#login').css('display', 'none');
+    }
   });
 }
 
@@ -111,7 +125,7 @@ async function getAllPlaylists(accessToken) {
   while (isSomethingLeft) {
     var response = await getPlaylists(accessToken, offset);
     playlistItems.push(response);
-    //50 -> max number of lists to get from response
+    // 50 -> max number of lists to get from response
     if (response.items.length === 50) {
       offset += 50;
     } else {
@@ -154,18 +168,18 @@ function sortMapByValue(array) {
 
 function getCorrectFolder(folders, playlists, i) {
   var folder;
-  if(playlists[i].name.includes('::') ) { //TODO add configuration for this
+  if(playlists[i].name.includes('::') ) { // TODO add configuration for this
     var folderNameToFind = playlists[i].name.split('::')[0];
     if(typeof folders.get(folderNameToFind) === 'undefined') { 
-      //Create new folder
+      // Create new folder
       folder = new Folder(folderNameToFind, new Map());
       folders.set(folder.name, folder);
     } else {
-      //Use existing folder
+      // Use existing folder
       folder = folders.get(folderNameToFind);
     }
   } else {
-    //Use general
+    // Use general
     folder = folders.get('General');
   }
   
@@ -224,21 +238,21 @@ function populateTracksFromResponse(folders, playlists, response) {
     var folder = new Folder('General', new Map());
     folders.set(folder.name, folder);
 
-    getAllPlaylists(accessToken).then(function(playlists) {
-      var mapPlaylists = {};
-      playlists.forEach(function(playlist) {
-        mapPlaylists[playlist.id] = playlist.name;
-      });
-
-      getUserId(accessToken).then(function(userId) {
-        var promises = [];
-        for ( var key in mapPlaylists) {
-          var url = 'https://api.spotify.com/v1/users/' + userId + '/playlists/' + key + '/tracks';
-          promises.push(getAPIResponse(url, accessToken));
-        }
-
-        Promise.all(promises).then(function() {
-          populateTracksFromResponse(folders, playlists, arguments[0]);
+    getUserId(accessToken).then(function(userId) {
+      getAllPlaylists(accessToken).then(function(playlists) {
+        var mapPlaylists = {};
+        playlists.forEach(function(playlist) {
+          mapPlaylists[playlist.id] = playlist.name;
+        });
+  
+          var promises = [];
+          for ( var key in mapPlaylists) {
+            var url = 'https://api.spotify.com/v1/users/' + userId + '/playlists/' + key + '/tracks';
+            promises.push(getAPIResponse(url, accessToken));
+          }
+  
+          Promise.all(promises).then(function() {
+            populateTracksFromResponse(folders, playlists, arguments[0]);
         }).then(function() {
           sortFolders(folders);
           displayResult(folders);

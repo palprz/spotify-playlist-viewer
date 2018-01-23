@@ -71,7 +71,7 @@
 	border-radius: 2px;
 }
 
-#result ul i i:hover {
+.utils i:hover, #result ul i i:hover {
 	margin: 0em 0.5em 0em 0em;
 	cursor: pointer;
 	border: 0.1em solid #69f0ae;
@@ -100,10 +100,11 @@ nav .settings:hover {
 	top: -40px;
 }
 
-.utils {
+.configuration {
 	display: none;
 }
 
-.configuration {
+.utils {
 	display: none;
+	height: 30px; //TODO soomething better
 }
