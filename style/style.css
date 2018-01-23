@@ -1,69 +1,69 @@
-ul {
+#result ul {
 	border-left: 1px solid #ddd;
 	border-right: 1px solid #ddd;
 	font-size: 20px;
 }
 
-ul ul {
+#result ul ul {
 	border-left: none;
 	border-right: none;
 	border-bottom: none;
 }
 
-ul ul ul {
+#result ul ul ul {
 	border-bottom: none;
 }
 
-li {
+#result li {
 	border-top: 1px solid #ddd;
 	line-height: 4em;
 	padding-left: 3em;
 	border-bottom: 1px solid #ddd;
 }
 
-li li {
+#result li li {
 	line-height: 3em;
 	margin-left: 2em;
 	border-bottom: none;
 }
 
-li li li {
+#result li li li {
 	line-height: 3em;
 	margin-left: 2em;
 	border-bottom: none;
 }
 
-li:hover {
+#result li:hover {
 	border-left: 0.5em solid #00c853;
 	padding-left: 2.5em;
 	transition: 0.05s ease-out;
 }
 
-li li:hover {
+#result li li:hover {
 	border-left: 0.5em solid #69f0ae;
 	padding-left: 2.5em;
 	transition: 0.05s ease-out;
 }
 
-li li a:hover {
+#result li li a:hover {
 	border-bottom: 2px solid #4caf50;
 }
 
-li li li:hover {
+#result li li li:hover {
 	border-left: 0.5em solid #b9f6ca;
 	padding-left: 2.5em;
 	transition: 0.05s ease-out;
 }
 
-li li li a:hover {
+#result li li li a:hover {
 	border-bottom: 2px solid #4caf50;
 }
 
-i {
+#result ul i {
 	margin: 0.1em 0.6em 0.1em 0.1em;
 }
 
-i:hover {
+#result ul i:hover {
 	margin: 0em 0.5em 0em 0em;
 	cursor: pointer;
 	border: 0.1em solid #00c853;
@@ -71,7 +71,7 @@ i:hover {
 	border-radius: 2px;
 }
 
-i i:hover {
+#result ul i i:hover {
 	margin: 0em 0.5em 0em 0em;
 	cursor: pointer;
 	border: 0.1em solid #69f0ae;
@@ -84,12 +84,16 @@ i i:hover {
 }
 
 #login {
-	/* TODO take something interesting from CSS framework */
 	display: block;
+	width: 10em;
 }
 
 nav {
 	height: 120px;
+}
+
+nav .settings:hover {
+	cursor: pointer;
 }
 
 .nav-wrapper img {
@@ -97,5 +101,9 @@ nav {
 }
 
 .utils {
+	display: none;
+}
+
+.configuration {
 	display: none;
 }

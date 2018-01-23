@@ -34,6 +34,12 @@ function initBasicAnimation() {
     });
   });
 
+  $(document).on('click', '.settings', function() {
+    $('.configuration').animate({
+      height: 'toggle'
+    });
+  });
+  
   $(document).on('click', '.expand-all', function() {
     $('.card').find('ul').animate({
       height: 'show'
@@ -45,6 +51,8 @@ function initBasicAnimation() {
       height: 'hide'
     });
   });
+
+  $('select').material_select();
 }
 
 function login() {
@@ -148,15 +156,13 @@ function getCorrectFolder(folders, playlists, i) {
   var folder;
   if(playlists[i].name.includes('::') ) { //TODO add configuration for this
     var folderNameToFind = playlists[i].name.split('::')[0];
-    console.log('blah: ' + folderNameToFind);
-    if(folders.get(folderNameToFind) === 'undefined') { //TODO wut?
-      console.log(folderNameToFind);
-      //Use existing folder
-      folder = folders.get(folderNameToFind);
-    } else {
+    if(typeof folders.get(folderNameToFind) === 'undefined') { 
       //Create new folder
       folder = new Folder(folderNameToFind, new Map());
       folders.set(folder.name, folder);
+    } else {
+      //Use existing folder
+      folder = folders.get(folderNameToFind);
     }
   } else {
     //Use general

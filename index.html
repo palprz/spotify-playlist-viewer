@@ -10,16 +10,19 @@
 	rel="stylesheet">
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
 </head>
 <body>
 	<nav>
 		<div class="nav-wrapper">
 			<div class="container">
 				<img class="brand-logo left" src="img/logo_spv.png" height="200"
-					width="200" />
+					width="200" /> <i class="material-icons right settings">settings</i>
 			</div>
 		</div>
 	</nav>
+
 	<div class="container">
 		<p>
 			Page create by Przemyslaw Paluch (check my code on <a
@@ -29,12 +32,69 @@
 			<i class="expand-all material-icons">expand_more</i> <i
 				class="collapse-all material-icons">expand_less</i>
 		</div>
-		<button id='login'>Log in</button>
+
+		<!-- 		<i class="material-icons">error_outline</i> -->
+
+		<a id="login" class="waves-effect waves-light btn"><i
+			class="material-icons left">fingerprint</i>Login</a>
+
 		<div class="progress">
 			<div class="indeterminate"></div>
 		</div>
-		<div id='result'></div>
+
+		<div class="configuration card">
+			<div class="row">
+				<form class="col s12">
+					<div class="input-field col s6">
+						<input id="todo1" type="text"> <label for="todo1">TODO
+							Name of general folder </label>
+					</div>
+					<div class="input-field col s6">
+						<input id="todo3" type="text"> <label for="todo3">TODO
+							Theme: day/night</label>
+					</div>
+				</form>
+			</div>
+			<div class="row">
+				<form class="col s12">
+					<div class="input-field col s6">
+						<input id="todo2" type="text"> <label for="todo2">TODO
+							Folder splitter </label>
+					</div>
+					<div class="col s6">
+						<label>TODO Show badgets for track</label>
+						<div class="switch">
+							<label> Off <input type="checkbox"> <span
+								class="lever"></span> On
+							</label>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="row">
+				<form class="col s12">
+					<div class="input-field col s6">
+						<select>
+							<option value="1">TODO way 1</option>
+							<option value="2">TODO way 2</option>
+							<option value="3">TODO way 3</option>
+						</select> <label>TODO Way of showing playlists</label>
+					</div>
+					<div class="col s6">
+						<label>TODO Show additional info abut playlists</label>
+						<div class="switch">
+							<label> Off <input type="checkbox"> <span
+								class="lever"></span> On
+							</label>
+						</div>
+					</div>
+				</form>
+			</div>
+			<a class="waves-effect waves-light btn">Save</a>
+		</div>
+		
+		<div id="result"></div>
 	</div>
-	<script src='js/script.js'></script>
+	<script src="js/script.js"></script>
 </body>
 </html>
