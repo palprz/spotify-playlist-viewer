@@ -15,7 +15,7 @@ function Artist(id, name, albums) {
 }
 
 function initBasicAnimation() {
-  $(document).on('click', '#login', function() {
+    $(document).on('click', '#login', function() {
     console.log('Start login...');
     $('.progress').css('display', 'block');
     login();
@@ -39,7 +39,7 @@ function initBasicAnimation() {
       height: 'toggle'
     });
   });
-  
+
   $(document).on('click', '.expand-all', function() {
     $('.card').find('ul').animate({
       height: 'show'
@@ -59,8 +59,8 @@ function login() {
   var client_id = 'c676b1cde38a4bf9a725cafebeab4c69';
   var redirect_uri = 'https://rawgit.com/palprz/spotify-playlist-viewer/master/index.html';
 
-  var url = 'https://accounts.spotify.com/authorize?client_id=' + client_id + '&redirect_uri=' + redirect_uri
-          + '&scope=playlist-read-private&response_type=token';
+  var url = 'https://accounts.spotify.com/authorize?client_id=' + client_id + '&redirect_uri=' + redirect_uri +
+    '&scope=playlist-read-private&response_type=token';
 
   window.location = url;
 }
@@ -73,7 +73,7 @@ function getAPIResponse(url, accessToken) {
     }
   }).fail(function(jqXHR, textStatus, errorThrown) {
     var status = jqXHR.status;
-    if(status === 401) {
+    if (status === 401) {
       // TODO create something more fancy than that
       $('#result').html('<b style="font-size: 72px">Ooops!</b><p>There was a problem with authorize your session (calm down - probably it just expired).</p><p>Please click magic button with text "LOGIN" and you will fix this problem.</p>');
       $('.progress').css('display', 'none');
@@ -103,8 +103,8 @@ function displayResult(folders) {
   folders.forEach(function(folder) {
     html += '<li><i class="expand-collapse material-icons">expand_less</i><span>' + folder.name + '</span><ul>';
     folder.artists.forEach(function(artist) {
-      html += '<li><i class="expand-collapse material-icons">expand_less</i><span><a href="spotify:artist:' + artist.id
-              + '">' + artist.name + '</a></span><ul>';
+      html += '<li><i class="expand-collapse material-icons">expand_less</i><span><a href="spotify:artist:' + artist.id +
+        '">' + artist.name + '</a></span><ul>';
       artist.albums.forEach(function(album) {
         html += '<li><span><a href="spotify:album:' + album.id + '">' + album.name + '</a></span></li>';
       });
@@ -132,9 +132,9 @@ async function getAllPlaylists(accessToken) {
       isSomethingLeft = false;
     }
   }
-  
+
   var playlists = [];
-  for(var i = 0; i < playlistItems.length; i++) {
+  for (var i = 0; i < playlistItems.length; i++) {
     playlists.push(...playlistItems[i].items);
   }
 
@@ -143,23 +143,23 @@ async function getAllPlaylists(accessToken) {
 
 function sortFolders(folders) {
   folders.forEach(function(folder) {
-    folder.artists= sortMapByValue([...folder.artists]);
+    folder.artists = sortMapByValue([...folder.artists]);
     folder.artists.forEach(function(artist) {
-      artist.albums= sortMapByValue([...artist.albums]);
+      artist.albums = sortMapByValue([...artist.albums]);
     });
   });
 }
 
 function sortMapByValue(array) {
-  var sortedArray = array.sort(function(a,b) {
-    if(a[1].name > b[1].name) {
+  var sortedArray = array.sort(function(a, b) {
+    if (a[1].name > b[1].name) {
       return 1;
     }
 
-    if(a[1].name < b[1].name) {
+    if (a[1].name < b[1].name) {
       return -1;
     }
-    
+
     return 0;
   });
 
@@ -168,9 +168,9 @@ function sortMapByValue(array) {
 
 function getCorrectFolder(folders, playlists, i) {
   var folder;
-  if(playlists[i].name.includes('::') ) { // TODO add configuration for this
+  if (playlists[i].name.includes('::')) { // TODO add configuration for this
     var folderNameToFind = playlists[i].name.split('::')[0];
-    if(typeof folders.get(folderNameToFind) === 'undefined') { 
+    if (typeof folders.get(folderNameToFind) === 'undefined') {
       // Create new folder
       folder = new Folder(folderNameToFind, new Map());
       folders.set(folder.name, folder);
@@ -182,15 +182,15 @@ function getCorrectFolder(folders, playlists, i) {
     // Use general
     folder = folders.get('General');
   }
-  
+
   return folder;
 }
 
 function populateTracksFromResponse(folders, playlists, response) {
   for (var i = 0; i < response.length; i++) {
-    
+
     var folder = getCorrectFolder(folders, playlists, i);
-    
+
     response[i].items.forEach(function(item) {
       var albumId = item.track.album.id;
       var albumName = item.track.album.name;
@@ -202,7 +202,7 @@ function populateTracksFromResponse(folders, playlists, response) {
       if (typeof folder.artists.get(artistId) === 'undefined') {
         // No artist means no album
         var album = new Album(albumId, albumName);
-        
+
         var map = new Map();
         map.set(albumId, album);
         var artist = new Artist(artistId, artistName, map);
@@ -217,12 +217,12 @@ function populateTracksFromResponse(folders, playlists, response) {
         }
       }
     });
-  } 
+  }
 }
 
 (function() {
   initBasicAnimation();
-  
+
   // Get parameters from URL
   var vars = window.location.hash.substring(1).split('&');
   var accessToken;
@@ -244,15 +244,15 @@ function populateTracksFromResponse(folders, playlists, response) {
         playlists.forEach(function(playlist) {
           mapPlaylists[playlist.id] = playlist.name;
         });
-  
-          var promises = [];
-          for ( var key in mapPlaylists) {
-            var url = 'https://api.spotify.com/v1/users/' + userId + '/playlists/' + key + '/tracks';
-            promises.push(getAPIResponse(url, accessToken));
-          }
-  
-          Promise.all(promises).then(function() {
-            populateTracksFromResponse(folders, playlists, arguments[0]);
+
+        var promises = [];
+        for (var key in mapPlaylists) {
+          var url = 'https://api.spotify.com/v1/users/' + userId + '/playlists/' + key + '/tracks';
+          promises.push(getAPIResponse(url, accessToken));
+        }
+
+        Promise.all(promises).then(function() {
+          populateTracksFromResponse(folders, playlists, arguments[0]);
         }).then(function() {
           sortFolders(folders);
           displayResult(folders);

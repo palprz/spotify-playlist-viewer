@@ -1,110 +1,110 @@
 #result ul {
-	border-left: 1px solid #ddd;
-	border-right: 1px solid #ddd;
-	font-size: 20px;
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  font-size: 20px;
 }
 
 #result ul ul {
-	border-left: none;
-	border-right: none;
-	border-bottom: none;
+  border-left: none;
+  border-right: none;
+  border-bottom: none;
 }
 
 #result ul ul ul {
-	border-bottom: none;
+  border-bottom: none;
 }
 
 #result li {
-	border-top: 1px solid #ddd;
-	line-height: 4em;
-	padding-left: 3em;
-	border-bottom: 1px solid #ddd;
+  border-top: 1px solid #ddd;
+  line-height: 4em;
+  padding-left: 3em;
+  border-bottom: 1px solid #ddd;
 }
 
 #result li li {
-	line-height: 3em;
-	margin-left: 2em;
-	border-bottom: none;
+  line-height: 3em;
+  margin-left: 2em;
+  border-bottom: none;
 }
 
 #result li li li {
-	line-height: 3em;
-	margin-left: 2em;
-	border-bottom: none;
+  line-height: 3em;
+  margin-left: 2em;
+  border-bottom: none;
 }
 
 #result li:hover {
-	border-left: 0.5em solid #00c853;
-	padding-left: 2.5em;
-	transition: 0.05s ease-out;
+  border-left: 0.5em solid #00c853;
+  padding-left: 2.5em;
+  transition: 0.05s ease-out;
 }
 
 #result li li:hover {
-	border-left: 0.5em solid #69f0ae;
-	padding-left: 2.5em;
-	transition: 0.05s ease-out;
+  border-left: 0.5em solid #69f0ae;
+  padding-left: 2.5em;
+  transition: 0.05s ease-out;
 }
 
 #result li li a:hover {
-	border-bottom: 2px solid #4caf50;
+  border-bottom: 2px solid #4caf50;
 }
 
 #result li li li:hover {
-	border-left: 0.5em solid #b9f6ca;
-	padding-left: 2.5em;
-	transition: 0.05s ease-out;
+  border-left: 0.5em solid #b9f6ca;
+  padding-left: 2.5em;
+  transition: 0.05s ease-out;
 }
 
 #result li li li a:hover {
-	border-bottom: 2px solid #4caf50;
+  border-bottom: 2px solid #4caf50;
 }
 
 #result ul i {
-	margin: 0.1em 0.6em 0.1em 0.1em;
+  margin: 0.1em 0.6em 0.1em 0.1em;
 }
 
 #result ul i:hover {
-	margin: 0em 0.5em 0em 0em;
-	cursor: pointer;
-	border: 0.1em solid #00c853;
-	transition: 0.1s ease-out;
-	border-radius: 2px;
+  margin: 0em 0.5em 0em 0em;
+  cursor: pointer;
+  border: 0.1em solid #00c853;
+  transition: 0.1s ease-out;
+  border-radius: 2px;
 }
 
 .utils i:hover, #result ul i i:hover {
-	margin: 0em 0.5em 0em 0em;
-	cursor: pointer;
-	border: 0.1em solid #69f0ae;
-	transition: 0.1s ease-out;
-	border-radius: 2px;
+  margin: 0em 0.5em 0em 0em;
+  cursor: pointer;
+  border: 0.1em solid #69f0ae;
+  transition: 0.1s ease-out;
+  border-radius: 2px;
 }
 
 .progress {
-	display: block;
+  display: block;
 }
 
 #login {
-	display: block;
-	width: 10em;
+  display: block;
+  width: 10em;
 }
 
 nav {
-	height: 120px;
+  height: 120px;
 }
 
 nav .settings:hover {
-	cursor: pointer;
+  cursor: pointer;
 }
 
 .nav-wrapper img {
-	top: -40px;
+  top: -40px;
 }
 
 .configuration {
-	display: none;
+  display: none;
 }
 
 .utils {
-	display: none;
-	height: 30px; //TODO soomething better
+  display: none;
+  height: 30px; //TODO soomething better
 }
