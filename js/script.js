@@ -159,6 +159,25 @@ utils = {
   }
 }
 
+check = {
+  //50 is a max number of playlists which response can have.
+  containsMaxPlaylists: function(response) {
+    return response.items.length === 50;
+  },
+  hasPlaylistSeparator: function(playlist) {
+    return playlist.name.includes('::');
+  },
+  folderExists: function(folders, folderNameToFind) {
+    return typeof folders.get(folderNameToFind) !== 'undefined';
+  },
+  artistExists: function(folder, artistId) {
+    return typeof folder.artists.get(artistId) !== 'undefined';
+  },
+  albumExists: function(artist, albumId) {
+    return typeof artist.albums.get(albumId) !== 'undefined';
+  }
+}
+
 async function getAllPlaylists(accessToken) {
   var isSomethingLeft = true;
   var offset = 0;
@@ -166,9 +185,7 @@ async function getAllPlaylists(accessToken) {
   while (isSomethingLeft) {
     var response = await api.getPlaylists(accessToken, offset);
     playlistItems.push(response);
-    // 50 -> max number of lists to get from response
-    // TODO add separate function for this condition
-    if (response.items.length === 50) {
+    if (check.containsMaxPlaylists(response)) {
       offset += 50;
     } else {
       isSomethingLeft = false;
@@ -185,15 +202,15 @@ async function getAllPlaylists(accessToken) {
 
 function getCorrectFolder(folders, playlists, i) {
   var folder;
-  if (playlists[i].name.includes('::')) { // TODO add configuration for this + separate function
+  if (check.hasPlaylistSeparator(playlists[i])) {
     var folderNameToFind = playlists[i].name.split('::')[0];
-    if (typeof folders.get(folderNameToFind) === 'undefined') { //TODO add separate function
+    if (check.folderExists(folders, folderNameToFind)) {
+      // Use existing folder
+      folder = folders.get(folderNameToFind);
+    } else {
       // Create new folder
       folder = new Folder(folderNameToFind, new Map());
       folders.set(folder.name, folder);
-    } else {
-      // Use existing folder
-      folder = folders.get(folderNameToFind);
     }
   } else {
     // Use general
@@ -216,8 +233,15 @@ function populateTracksFromResponse(folders, playlists, response) {
       var artistName = item.track.artists[0].name;
 
       // Find artist
-      //  TODO add separate function
-      if (typeof folder.artists.get(artistId) === 'undefined') {
+      if (check.artistExists(folder, artistId)) {
+        // There is artist
+        var foundArtist = folder.artists.get(artistId);
+        if (!check.albumExists(foundArtist, albumId)) {
+          // No album
+          var newAlbum = new Album(albumId, albumName);
+          foundArtist.albums.set(albumId, newAlbum);
+        }
+      } else {
         // No artist means no album
         var album = new Album(albumId, albumName);
 
@@ -225,15 +249,6 @@ function populateTracksFromResponse(folders, playlists, response) {
         map.set(albumId, album);
         var artist = new Artist(artistId, artistName, map);
         folder.artists.set(artistId, artist);
-      } else {
-        // There is artist
-        var foundArtist = folder.artists.get(artistId);
-        //TODO add separate function
-        if (typeof foundArtist.albums.get(albumId) === 'undefined') {
-          // No album
-          var newAlbum = new Album(albumId, albumName);
-          foundArtist.albums.set(albumId, newAlbum);
-        }
       }
     });
   }
