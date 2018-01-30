@@ -10,10 +10,6 @@
   border-bottom: none;
 }
 
-#result ul ul ul {
-  border-bottom: none;
-}
-
 #result li {
   border-top: 1px solid #ddd;
   line-height: 4em;
@@ -27,12 +23,6 @@
   border-bottom: none;
 }
 
-#result li li li {
-  line-height: 3em;
-  margin-left: 2em;
-  border-bottom: none;
-}
-
 #result li:hover {
   border-left: 0.5em solid #00c853;
   padding-left: 2.5em;
@@ -41,22 +31,30 @@
 
 #result li li:hover {
   border-left: 0.5em solid #69f0ae;
-  padding-left: 2.5em;
-  transition: 0.05s ease-out;
+}
+
+#result li li li:hover {
+  border-left: 0.5em solid #b9f6ca;
+}
+
+#result li li li li:hover {
+  border-left: 0.5em solid #e8f5e9;
 }
 
 #result li li a:hover {
   border-bottom: 2px solid #4caf50;
 }
 
-#result li li li:hover {
-  border-left: 0.5em solid #b9f6ca;
-  padding-left: 2.5em;
-  transition: 0.05s ease-out;
+#result ul .badge {
+  background-color: #00c853;
 }
 
-#result li li li a:hover {
-  border-bottom: 2px solid #4caf50;
+#result ul ul .badge {
+  background-color: #69f0ae;
+}
+
+#result ul ul ul .badge {
+  background-color: #b9f6ca;
 }
 
 #result ul i {
@@ -107,4 +105,8 @@ nav .settings:hover {
 .utils {
   display: none;
   height: 30px; //TODO soomething better
+}
+
+.badge {
+  margin-top: 1.5em; //TODO still looks terrible... do something with that!
 }

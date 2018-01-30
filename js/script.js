@@ -1,17 +1,26 @@
 function Folder(name, artists) {
   this.name = name;
   this.artists = artists;
-}
-
-function Album(id, name) {
-  this.id = id;
-  this.name = name;
+  this.trackCount = 0;
 }
 
 function Artist(id, name, albums) {
   this.id = id;
   this.name = name;
   this.albums = albums;
+  this.trackCount = 0;
+}
+
+function Album(id, name, tracks) {
+  this.id = id;
+  this.name = name;
+  this.tracks = tracks;
+  this.trackCount = tracks.size;
+}
+
+function Track(id, name) {
+  this.id = id;
+  this.name = name;
 }
 
 api = {
@@ -119,11 +128,15 @@ ui = {
   displayResult: function(folders) {
     var html = '<ul class="card">';
     folders.forEach(function(folder) {
-      html += '<li><i class="expand-collapse material-icons">expand_less</i><span>' + folder.name + '</span><ul>';
+      html += '<li><i class="expand-collapse material-icons">expand_less</i><span>' + folder.name + '</span><span class="new badge" data-badge-caption="track(s)">' + folder.trackCount + '</span><ul>';
       folder.artists.forEach(function(artist) {
-        html += '<li><i class="expand-collapse material-icons">expand_less</i><span><a href="spotify:artist:' + artist.id + '">' + artist.name + '</a></span><ul>';
+        html += '<li><i class="expand-collapse material-icons">expand_less</i><span><a href="spotify:artist:' + artist.id + '">' + artist.name + '</a></span><span class="new badge" data-badge-caption="track(s)">' + artist.trackCount + '</span><ul>';
         artist.albums.forEach(function(album) {
-          html += '<li><span><a href="spotify:album:' + album.id + '">' + album.name + '</a></span></li>';
+          html += '<li><i class="expand-collapse material-icons">expand_less</i><span><a href="spotify:album:' + album.id + '">' + album.name + '</a></span><span class="new badge" data-badge-caption="track(s)">' + album.trackCount + '</span><ul>';
+          album.tracks.forEach(function(track) {
+            html += '<li><span><a href="spotify:track:' + track.id + '">' + track.name + '</a></span></li>';
+          });
+          html += '</ul></li>';
         });
         html += '</ul></li>';
       });
@@ -141,6 +154,9 @@ utils = {
       folder.artists = utils.sortMapByValue([...folder.artists]);
       folder.artists.forEach(function(artist) {
         artist.albums = utils.sortMapByValue([...artist.albums]);
+        artist.albums.forEach(function(album) {
+          album.tracks = utils.sortMapByValue([...album.tracks]);
+        })
       });
     });
   },
@@ -156,6 +172,15 @@ utils = {
     });
 
     return new Map(sortedArray.map(obj => [obj[0], obj[1]]));
+  },
+  getAccessTokenFromURL: function() {
+    var parameters = window.location.hash.substring(1).split('&');
+    var accessToken;
+    if (parameters.length > 0) {
+      accessToken = parameters[0].split('=')[1];
+    }
+
+    return accessToken;
   }
 }
 
@@ -224,30 +249,47 @@ function populateTracksFromResponse(folders, playlists, response) {
   for (var i = 0; i < response.length; i++) {
 
     var folder = getCorrectFolder(folders, playlists, i);
+    folder.trackCount += response[i].items.length;
 
     response[i].items.forEach(function(item) {
-      var albumId = item.track.album.id;
-      var albumName = item.track.album.name;
-
       var artistId = item.track.artists[0].id;
       var artistName = item.track.artists[0].name;
 
-      // Find artist
+      var albumId = item.track.album.id;
+      var albumName = item.track.album.name;
+
+      var trackId = item.track.id;
+      var trackName = item.track.name;
+
       if (check.artistExists(folder, artistId)) {
-        // There is artist
+        // Found artist
         var foundArtist = folder.artists.get(artistId);
-        if (!check.albumExists(foundArtist, albumId)) {
+        if (check.albumExists(foundArtist, albumId)) {
+          // Found album
+          var track = new Track(trackId, trackName);
+          var foundAlbum = foundArtist.albums.get(albumId);
+          foundAlbum.tracks.set(trackId, track); // TODO create updateTracks function in Album function
+          foundAlbum.trackCount = foundAlbum.tracks.size;
+        } else {
           // No album
-          var newAlbum = new Album(albumId, albumName);
+          var track = new Track(trackId, trackName);
+          var map = new Map();
+          map.set(trackId, track);
+          var newAlbum = new Album(albumId, albumName, map);
           foundArtist.albums.set(albumId, newAlbum);
         }
+        foundArtist.trackCount += 1;
       } else {
         // No artist means no album
-        var album = new Album(albumId, albumName);
+        var track = new Track(trackId, trackName);
+        var map = new Map();
+        map.set(trackId, track);
+        var album = new Album(albumId, albumName, map);
 
         var map = new Map();
         map.set(albumId, album);
         var artist = new Artist(artistId, artistName, map);
+        artist.trackCount += 1;
         folder.artists.set(artistId, artist);
       }
     });
@@ -256,13 +298,7 @@ function populateTracksFromResponse(folders, playlists, response) {
 
 (function() {
   ui.initBasicAnimation();
-
-  // Get parameters from URL
-  var vars = window.location.hash.substring(1).split('&');
-  var accessToken;
-  if (vars.length > 0) {
-    accessToken = vars[0].split('=')[1];
-  }
+  var accessToken = utils.getAccessTokenFromURL();
 
   if (accessToken !== undefined) {
     ui.displayProgressElements();
