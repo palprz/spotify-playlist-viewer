@@ -77,24 +77,24 @@
   border-radius: 2px;
 }
 
-.progress {
-  display: block;
-}
-
 #login {
   display: block;
   width: 10em;
 }
 
-nav {
+#progress {
+  display: block;
+}
+
+#top-bar {
   height: 120px;
 }
 
-nav .settings:hover {
+#top-bar .settings:hover {
   cursor: pointer;
 }
 
-.nav-wrapper img {
+#top-bar .nav-wrapper img {
   top: -40px;
 }
 

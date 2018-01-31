@@ -60,30 +60,30 @@ api = {
 
 ui = {
   displayLoginElements: function() {
-    $('.progress').css('display', 'none');
+    $('#progress-bar').css('display', 'none');
     $('.utils').css('display', 'none');
   },
   displayProgressElements: function() {
     $('#login').css('display', 'none');
-    $('.progress').css('display', 'block');
+    $('#progress-bar').css('display', 'block');
   },
   displayResultElements: function() {
-    $('.progress').css('display', 'none');
+    $('#progress-bar').css('display', 'none');
     $('.utils').css('display', 'block');
   },
   display401Error: function() {
     // TODO create something more fancy than that
     $('#result').html('<b style="font-size: 72px">Ooops!</b><p>There was a problem with authorize your session (calm down - probably it just expired).</p><p>Please click magic button with text "LOGIN" and you will fix this problem.</p>');
-    $('.progress').css('display', 'none');
-    $('.utils').css('display', 'none');
+    $('#progress-bar').css('display', 'none');
     $('#login').css('display', 'block');
+    $('.utils').css('display', 'none');
   },
   displayGeneralError: function() {
     // TODO create something more fancy than that
     $('#result').html('<p> <b style="font-size: 72px">:(</b></p><p>Something terrible wrong happend!</p><p>If you are not angry enough after this error to close this page, please send me details from console browser in new issue which you can create on the <a href="https://github.com/palprz/spotify-playlist-viewer/issues">Github</a>. I will be happy to help you with it!</p>');
-    $('.progress').css('display', 'none');
-    $('.utils').css('display', 'none');
+    $('#progress-bar').css('display', 'none');
     $('#login').css('display', 'none');
+    $('.utils').css('display', 'none');
   },
   initBasicAnimation: function() {
     $(document).on('click', '#login', function() {
