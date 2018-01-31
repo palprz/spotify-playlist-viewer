@@ -108,5 +108,6 @@ nav .settings:hover {
 }
 
 .badge {
+  display: none;
   margin-top: 1.5em; //TODO still looks terrible... do something with that!
 }

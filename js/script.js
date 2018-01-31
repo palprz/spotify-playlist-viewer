@@ -123,6 +123,20 @@ ui = {
       });
     });
 
+    $(document).on('mouseenter', '#result span', function() {
+      var $badge = $(this).parent().children('.badge');
+      if ($badge.length !== 0) {
+        $badge.css('display', 'block');
+      }
+    });
+
+    $(document).on('mouseleave', '#result span', function() {
+      var $badge = $(this).parent().children('.badge');
+      if ($badge.length !== 0) {
+        $badge.css('display', 'none');
+      }
+    });
+
     $('select').material_select();
   },
   displayResult: function(folders) {
