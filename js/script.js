@@ -123,19 +123,21 @@ ui = {
       });
     });
 
-    $(document).on('mouseenter', '#result span', function() {
-      var $badge = $(this).parent().children('.badge');
-      if ($badge.length !== 0) {
-        $badge.css('display', 'block');
-      }
-    });
+    if (config.isTrackBadges()) {
+      $(document).on('mouseenter', '#result span', function() {
+        var $badge = $(this).parent().children('.badge');
+        if ($badge.length !== 0) {
+          $badge.css('display', 'block');
+        }
+      });
 
-    $(document).on('mouseleave', '#result span', function() {
-      var $badge = $(this).parent().children('.badge');
-      if ($badge.length !== 0) {
-        $badge.css('display', 'none');
-      }
-    });
+      $(document).on('mouseleave', '#result span', function() {
+        var $badge = $(this).parent().children('.badge');
+        if ($badge.length !== 0) {
+          $badge.css('display', 'none');
+        }
+      });
+    }
 
     $(document).on('click', '#save-config', function() {
       config.save();
@@ -254,13 +256,13 @@ config = {
     return Cookies.get('display-data-way');
   },
   isNightTheme: function() {
-    return Cookies.get('night-theme');
+    return Cookies.get('night-theme') == 'true';
   },
   isTrackBadges: function() {
-    return Cookies.get('track-badges');
+    return Cookies.get('track-badges') == 'true';
   },
   isDefaultConfiguration: function() {
-    return Cookies.get('default-configuration');
+    return Cookies.get('default-configuration') == 'true';
   },
   isAnyConfiguration: function() {
     return Cookies.get('default-configuration') !== undefined;
