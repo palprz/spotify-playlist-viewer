@@ -9,6 +9,7 @@
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
 </head>
 
 <body>
@@ -28,31 +29,44 @@
 		<div class="configuration card">
 			<div class="row">
 				<form class="col s12">
-					<div class="input-field col s6">
-						<input id="todo1" type="text"> <label for="todo1">TODO Name of general folder </label>
-					</div>
-					<div class="input-field col s6">
-						<input id="todo3" type="text"> <label for="todo3">TODO Theme: day/night</label>
-					</div>
+					<div class="input-field col s12">
+TODO info about config (cannot be add empty value)
+TODO validation
+						</div>
 				</form>
 			</div>
 			<div class="row">
 				<form class="col s12">
 					<div class="input-field col s6">
-						<input id="todo2" type="text"> <label for="todo2">TODO Folder splitter </label>
+						<input id="general-folder-name" type="text"> <label>Name of general folder (default: 'General')</label>
 					</div>
 					<div class="col s6">
-						<label>TODO Show badgets for track</label>
+						<label>Display night theme (default: 'no')</label>
 						<div class="switch">
-							<label> Off <input type="checkbox"> <span class="lever"></span> On </label>
+							<label>No <input id="night-theme" type="checkbox"> <span class="lever"></span> Yes</label>
 						</div>
+						TODO add night theme + use this config
 					</div>
 				</form>
 			</div>
 			<div class="row">
 				<form class="col s12">
 					<div class="input-field col s6">
-						<select>
+						<input id="folder-splitter" type="text"> <label>Folder splitter (default: '::')</label>
+					</div>
+					<div class="col s6">
+						<label>Display info about tracks for folders, artists and albums (default: 'yes')</label>
+						<div class="switch">
+							<label>No <input id="track-badges" type="checkbox"> <span class="lever"></span> Yes</label>
+						</div>
+						TODO use this config
+					</div>
+				</form>
+			</div>
+			<div class="row">
+				<form class="col s12">
+					<div class="input-field col s6">
+						<select id="display-data-way">
 									<option value="1">TODO way 1</option>
 									<option value="2">TODO way 2</option>
 									<option value="3">TODO way 3</option>
@@ -60,14 +74,18 @@
 						<label>TODO Way of showing playlists</label>
 					</div>
 					<div class="col s6">
-						<label>TODO Show additional info abut playlists</label>
-						<div class="switch">
-							<label> Off <input type="checkbox"> <span class="lever"></span> On </label>
-						</div>
+						TODO add default and cancel buttons
 					</div>
 				</form>
 			</div>
-			<a class="waves-effect waves-light btn">Save</a>
+			<div class="row">
+				<form class="col s12">
+					TODO add nice view for buttons
+					<a id="save-config" class="waves-effect waves-light btn">Save</a>
+						<a id="default-config" class="waves-effect waves-light btn">Restore default</a>
+							<a id="cancel-config" class="waves-effect waves-light btn">Cancel</a>
+				</form>
+			</div>
 		</div>
 
 		<div class="utils">
@@ -78,7 +96,7 @@
 
 		<a id="login" class="waves-effect waves-light btn"><i class="material-icons left">fingerprint</i>Login</a>
 
-		<div id="progress-bar">
+		<div class="progress">
 			<div class="indeterminate"></div>
 		</div>
 

@@ -60,28 +60,28 @@ api = {
 
 ui = {
   displayLoginElements: function() {
-    $('#progress-bar').css('display', 'none');
+    $('.progress').css('display', 'none');
     $('.utils').css('display', 'none');
   },
   displayProgressElements: function() {
     $('#login').css('display', 'none');
-    $('#progress-bar').css('display', 'block');
+    $('.progress').css('display', 'block');
   },
   displayResultElements: function() {
-    $('#progress-bar').css('display', 'none');
+    $('.progress').css('display', 'none');
     $('.utils').css('display', 'block');
   },
   display401Error: function() {
     // TODO create something more fancy than that
     $('#result').html('<b style="font-size: 72px">Ooops!</b><p>There was a problem with authorize your session (calm down - probably it just expired).</p><p>Please click magic button with text "LOGIN" and you will fix this problem.</p>');
-    $('#progress-bar').css('display', 'none');
+    $('.progress').css('display', 'none');
     $('#login').css('display', 'block');
     $('.utils').css('display', 'none');
   },
   displayGeneralError: function() {
     // TODO create something more fancy than that
     $('#result').html('<p> <b style="font-size: 72px">:(</b></p><p>Something terrible wrong happend!</p><p>If you are not angry enough after this error to close this page, please send me details from console browser in new issue which you can create on the <a href="https://github.com/palprz/spotify-playlist-viewer/issues">Github</a>. I will be happy to help you with it!</p>');
-    $('#progress-bar').css('display', 'none');
+    $('.progress').css('display', 'none');
     $('#login').css('display', 'none');
     $('.utils').css('display', 'none');
   },
@@ -137,7 +137,36 @@ ui = {
       }
     });
 
+    $(document).on('click', '#save-config', function() {
+      config.save();
+      ui.hideConfiguration();
+      ui.refreshConfig();
+    });
+
+    $(document).on('click', '#default-config', function() {
+      config.default();
+      ui.hideConfiguration();
+      ui.refreshConfig();
+    });
+
+    $(document).on('click', '#cancel-config', function() {
+      ui.hideConfiguration();
+      ui.refreshConfig();
+    });
+
     $('select').material_select();
+  },
+  hideConfiguration: function() {
+    $('.configuration').animate({
+      height: 'hide'
+    });
+  },
+  refreshConfig: function() {
+    $('#general-folder-name').val(Cookies.get('general-folder-name'));
+    $('#folder-splitter').val(Cookies.get('folder-splitter'));
+    // TODO $('#display-data-way').val(Cookies.set('display-data-way'));
+    $('#night-theme').prop('checked', (Cookies.get('night-theme') == 'true'));
+    $('#track-badges').prop('checked', (Cookies.get('track-badges') == 'true'));
   },
   displayResult: function(folders) {
     var html = '<ul class="card">';
@@ -198,13 +227,53 @@ utils = {
   }
 }
 
+config = {
+  save: function() {
+    Cookies.set('general-folder-name', $('#general-folder-name').val());
+    Cookies.set('folder-splitter', $('#folder-splitter').val());
+    Cookies.set('display-data-way', $('#display-data-way').val());
+    Cookies.set('night-theme', $('#night-theme').is(":checked"));
+    Cookies.set('track-badges', $('#track-badges').is(":checked"));
+    Cookies.set('default-configuration', false);
+  },
+  default: function() {
+    Cookies.set('general-folder-name', 'General');
+    Cookies.set('folder-splitter', '::');
+    Cookies.set('display-data-way', 'TODO');
+    Cookies.set('night-theme', false);
+    Cookies.set('track-badges', true);
+    Cookies.set('default-configuration', true);
+  },
+  getGeneralFolderName: function() {
+    return Cookies.get('general-folder-name');
+  },
+  getFolderSplitter: function() {
+    return Cookies.get('folder-splitter');
+  },
+  getDisplayDataWay: function() {
+    return Cookies.get('display-data-way');
+  },
+  isNightTheme: function() {
+    return Cookies.get('night-theme');
+  },
+  isTrackBadges: function() {
+    return Cookies.get('track-badges');
+  },
+  isDefaultConfiguration: function() {
+    return Cookies.get('default-configuration');
+  },
+  isAnyConfiguration: function() {
+    return Cookies.get('default-configuration') !== undefined;
+  }
+}
+
 check = {
   //50 is a max number of playlists which response can have.
   containsMaxPlaylists: function(response) {
     return response.items.length === 50;
   },
   hasPlaylistSeparator: function(playlist) {
-    return playlist.name.includes('::');
+    return playlist.name.includes(config.getFolderSplitter());
   },
   folderExists: function(folders, folderNameToFind) {
     return typeof folders.get(folderNameToFind) !== 'undefined';
@@ -242,7 +311,7 @@ async function getAllPlaylists(accessToken) {
 function getCorrectFolder(folders, playlists, i) {
   var folder;
   if (check.hasPlaylistSeparator(playlists[i])) {
-    var folderNameToFind = playlists[i].name.split('::')[0];
+    var folderNameToFind = playlists[i].name.split(config.getFolderSplitter())[0];
     if (check.folderExists(folders, folderNameToFind)) {
       // Use existing folder
       folder = folders.get(folderNameToFind);
@@ -253,7 +322,7 @@ function getCorrectFolder(folders, playlists, i) {
     }
   } else {
     // Use general
-    folder = folders.get('General');
+    folder = folders.get(config.getGeneralFolderName());
   }
 
   return folder;
@@ -311,15 +380,20 @@ function populateTracksFromResponse(folders, playlists, response) {
 }
 
 (function() {
+  if (!config.isAnyConfiguration()) {
+    config.default();
+  }
+
   ui.initBasicAnimation();
+  ui.refreshConfig();
   var accessToken = utils.getAccessTokenFromURL();
 
   if (accessToken !== undefined) {
     ui.displayProgressElements();
 
     var folders = new Map();
-    var folder = new Folder('General', new Map());
-    folders.set(folder.name, folder);
+    var generalFolder = new Folder(config.getGeneralFolderName(), new Map());
+    folders.set(generalFolder.name, generalFolder);
 
     api.getUserId(accessToken).then(function(userId) {
       getAllPlaylists(accessToken).then(function(playlists) {
