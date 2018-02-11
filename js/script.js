@@ -182,6 +182,30 @@ ui = {
 
     $('select').material_select();
   },
+  showMaxExtendList: function() {
+    var configVal = Cookies.get('max-extend-list');
+    var whichElementOnlyShow = '';
+    switch (configVal) {
+      case 'folder':
+        whichElementOnlyShow = 'ul';
+        break;
+      case 'artist':
+        whichElementOnlyShow = 'ul ul';
+        break;
+      case 'album':
+        whichElementOnlyShow = 'ul ul ul';
+        break;
+      default:
+      case 'track':
+        break;
+    }
+
+    if (whichElementOnlyShow !== '') {
+      $('.card').find(whichElementOnlyShow).animate({
+        height: 'hide'
+      });
+    }
+  },
   hideConfiguration: function() {
     $('.configuration').animate({
       height: 'hide'
@@ -218,6 +242,7 @@ ui = {
 
     ui.displayResultElements();
     $('#result').html(html);
+    ui.showMaxExtendList();
   }
 }
 
