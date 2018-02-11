@@ -89,6 +89,7 @@
 
 #top-bar {
   height: 120px;
+  margin-bottom: 2em;
 }
 
 #top-bar .cookies:hover, #top-bar .settings:hover {
