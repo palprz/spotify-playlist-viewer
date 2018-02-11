@@ -118,41 +118,29 @@ ui = {
     });
 
     $(document).on('click', '.expand-all', function() {
-      $('.card').find('ul').animate({
+      $('#result').find('ul ul').animate({
         height: 'show'
       });
     });
 
     $(document).on('click', '.collapse-all', function() {
-      $('.card').find('ul').animate({
+      $('#result').find('ul ul').animate({
         height: 'hide'
       });
     });
-
-    if (config.isTrackBadges()) {
-      $(document).on('mouseenter', '#result span', function() {
-        var $badge = $(this).parent().children('.badge');
-        if ($badge.length !== 0) {
-          $badge.css('display', 'block');
-        }
-      });
-
-      $(document).on('mouseleave', '#result span', function() {
-        var $badge = $(this).parent().children('.badge');
-        if ($badge.length !== 0) {
-          $badge.css('display', 'none');
-        }
-      });
-    }
 
     $(document).on('click', '#close-cookies-info', function() {
       ui.hideCookiesInfo();
     });
 
-    $(document).on('click', '#save-config', function() {
-      config.save();
+    $(document).on('click', '#save-no-refresh-config', function() {
+      config.saveWithoutRefresh();
       ui.hideConfiguration();
       ui.refreshConfig();
+    });
+
+    $(document).on('click', '#save-and-refresh-config', function() {
+      config.saveWithRefresh();
     });
 
     $(document).on('click', '#default-config', function() {
@@ -184,27 +172,25 @@ ui = {
   },
   showMaxExtendList: function() {
     var configVal = Cookies.get('max-extend-list');
-    var whichElementOnlyShow = '';
+    var whichElementOnlyShow;
     switch (configVal) {
       case 'folder':
-        whichElementOnlyShow = 'ul';
-        break;
-      case 'artist':
         whichElementOnlyShow = 'ul ul';
         break;
-      case 'album':
+      case 'artist':
         whichElementOnlyShow = 'ul ul ul';
         break;
-      default:
-      case 'track':
+      case 'album':
+        whichElementOnlyShow = 'ul ul ul ul';
         break;
+      case 'track':
+      default:
+        return;
     }
 
-    if (whichElementOnlyShow !== '') {
-      $('.card').find(whichElementOnlyShow).animate({
-        height: 'hide'
-      });
-    }
+    $('#result').find(whichElementOnlyShow).animate({
+      height: 'hide'
+    });
   },
   hideConfiguration: function() {
     $('.configuration').animate({
@@ -217,10 +203,36 @@ ui = {
     });
   },
   refreshConfig: function() {
+    //TODO add other configs
     $('#general-folder-name').val(Cookies.get('general-folder-name'));
     $('#folder-splitter').val(Cookies.get('folder-splitter'));
     // TODO $('#display-data-way').val(Cookies.set('display-data-way'));
-    $('#track-badges').prop('checked', (Cookies.get('track-badges') == 'true'));
+  },
+  displayTrackBadges: function() {
+    var displayTrackBadges = config.getDisplayTrackBadges();
+    if (displayTrackBadges === 'always') {
+      $('#result').find('.badge').css('display', 'block');
+      return;
+    }
+
+    if (displayTrackBadges = 'never') {
+      $('#result').find('.badge').css('display', 'none');
+      return;
+    }
+
+    $(document).on('mouseenter', '#result span', function() {
+      var $badge = $(this).parent().children('.badge');
+      if ($badge.length !== 0) {
+        $badge.css('display', 'block');
+      }
+    });
+
+    $(document).on('mouseleave', '#result span', function() {
+      var $badge = $(this).parent().children('.badge');
+      if ($badge.length !== 0) {
+        $badge.css('display', 'none');
+      }
+    });
   },
   displayResult: function(folders) {
     var html = '<ul class="card">';
@@ -243,6 +255,7 @@ ui = {
     ui.displayResultElements();
     $('#result').html(html);
     ui.showMaxExtendList();
+    ui.displayTrackBadges();
   }
 }
 
@@ -280,11 +293,21 @@ utils = {
 }
 
 config = {
+  saveWithRefresh: function() {
+    config.save();
+    //Wait just in case
+    setTimeout(function() {
+      location.reload();
+    }, 100);
+  },
+  saveWithoutRefresh: function() {
+    config.save();
+  },
   save: function() {
     var generalFolderName = $('#general-folder-name').val();
     var folderSplitter = $('#folder-splitter').val();
     var displayDataWay = $('#display-data-way').val();
-    var trackBadges = $('#track-badges').is(":checked");
+    var trackBadges = $('#track-badges').val();
     var maxExtendList = $('#max-extend-list').val();
     var sorting = $('#sorting').val();
 
@@ -308,7 +331,7 @@ config = {
   default: function() {
     Cookies.set('general-folder-name', 'General');
     Cookies.set('display-data-way', 'TODO');
-    Cookies.set('track-badges', true);
+    Cookies.set('track-badges', 'mouse-over');
     Cookies.set('default-configuration', true);
     Cookies.set('max-extend-list', 'track');
     Cookies.set('sorting', 'a-z');
@@ -322,8 +345,8 @@ config = {
   getDisplayDataWay: function() {
     return Cookies.get('display-data-way');
   },
-  isTrackBadges: function() {
-    return Cookies.get('track-badges') == 'true';
+  getDisplayTrackBadges: function() {
+    return Cookies.get('track-badges');
   },
   isAnyConfiguration: function() {
     return Cookies.get('default-configuration') !== undefined;

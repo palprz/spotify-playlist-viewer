@@ -98,18 +98,23 @@
 								</select>
 						<label>Sorting (default: 'a-z')</label>
 					</div>
-					<div class="col s6">
-						<label>Display info about tracks for folders, artists and albums (default: 'yes') TODO change this to have always/mouse over/never</label>
-						<div class="switch">
-							<label>No <input id="track-badges" type="checkbox"> <span class="lever"></span> Yes</label>
-						</div>
+					<div class="input-field col s6">
+						<select id="track-badges">
+							<option value="always">always</option>
+							<option value="mouse-over">mouse over</option>
+							<option value="never">never</option>
+						</select>
+						<label>Display info about tracks for folders, artists and albums (default: 'mouse over')</label>
 					</div>
 				</form>
 			</div>
 			<div class="row">
 				<form class="col s12">
-					<div class="col s8">
-						<a id="save-config" class="left waves-effect waves-light btn">Save</a>
+					<div class="col s2">
+						<a id="save-no-refresh-config" class="left waves-effect waves-light btn">Save</a>
+					</div>
+					<div class="col s6">
+						<a id="save-and-refresh-config" class="left waves-effect waves-light btn">Save and refresh</a>
 					</div>
 					<div class="col s2">
 						<a id="default-config" class="right waves-effect waves-light btn">Default</a>
