@@ -1,3 +1,4 @@
+![Super logo of Spotify Playlist Viewer](https://raw.githubusercontent.com/palprz/spotify-playlist-viewer/master/img/logo_spv.png)
 # Spotify Playlist Viewer [January - February 2018]
 
 Simple web application for displaying playlists in different way than Spotify.
