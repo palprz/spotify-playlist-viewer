@@ -117,3 +117,16 @@
   display: none;
   margin-top: 1.5em; //TODO still looks terrible... do something with that!
 }
+
+#go-to-top-btn {
+  display: none;
+  position: fixed;
+  bottom: 0.5em;
+  right: 0.5em;
+  background-color: #00c853;
+}
+
+#go-to-top-btn:hover {
+  cursor: pointer;
+  background-color: #69f0ae;
+}

@@ -166,6 +166,20 @@ ui = {
       ui.refreshConfig();
     });
 
+    $(window).scroll(function() {
+      if ($(this).scrollTop() >= 50) {
+        $('#go-to-top-btn').fadeIn(500);
+      } else {
+        $('#go-to-top-btn').fadeOut(200);
+      }
+    });
+
+    $(document).on('click', '#go-to-top-btn', function() {
+      $('body,html').animate({
+        scrollTop: 0
+      }, 200);
+    });
+
     $('select').material_select();
   },
   hideConfiguration: function() {
