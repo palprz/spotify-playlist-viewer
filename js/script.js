@@ -222,26 +222,23 @@ ui = {
 }
 
 utils = {
+  //TODO uh, is there any better way to do this?
   sortFolders: function(folders) {
-    folders.forEach(function(folder) {
-      folder.artists = utils.sortMapByValue([...folder.artists]);
-      folder.artists.forEach(function(artist) {
-        artist.albums = utils.sortMapByValue([...artist.albums]);
-        artist.albums.forEach(function(album) {
-          album.tracks = utils.sortMapByValue([...album.tracks]);
-        })
+    if (config.shouldSort()) {
+      folders.forEach(function(folder) {
+        folder.artists = utils.sortMapByValue([...folder.artists]);
+        folder.artists.forEach(function(artist) {
+          artist.albums = utils.sortMapByValue([...artist.albums]);
+          artist.albums.forEach(function(album) {
+            album.tracks = utils.sortMapByValue([...album.tracks]);
+          })
+        });
       });
-    });
+    }
   },
   sortMapByValue: function(array) {
     var sortedArray = array.sort(function(a, b) {
-      if (a[1].name > b[1].name) {
-        return 1;
-      }
-      if (a[1].name < b[1].name) {
-        return -1;
-      }
-      return 0;
+      return config.isAZSort() ? a[1].name > b[1].name : a[1].name < b[1].name;
     });
 
     return new Map(sortedArray.map(obj => [obj[0], obj[1]]));
@@ -263,6 +260,9 @@ config = {
     var folderSplitter = $('#folder-splitter').val();
     var displayDataWay = $('#display-data-way').val();
     var trackBadges = $('#track-badges').is(":checked");
+    var maxExtendList = $('#max-extend-list').val();
+    var sorting = $('#sorting').val();
+
     if (generalFolderName === '') {
       Cookies.set('general-folder-name', 'General');
     } else {
@@ -277,12 +277,16 @@ config = {
     Cookies.set('display-data-way', displayDataWay);
     Cookies.set('track-badges', trackBadges);
     Cookies.set('default-configuration', false);
+    Cookies.set('max-extend-list', maxExtendList);
+    Cookies.set('sorting', sorting);
   },
   default: function() {
     Cookies.set('general-folder-name', 'General');
     Cookies.set('display-data-way', 'TODO');
     Cookies.set('track-badges', true);
     Cookies.set('default-configuration', true);
+    Cookies.set('max-extend-list', 'track');
+    Cookies.set('sorting', 'a-z');
   },
   getGeneralFolderName: function() {
     return Cookies.get('general-folder-name');
@@ -296,11 +300,14 @@ config = {
   isTrackBadges: function() {
     return Cookies.get('track-badges') == 'true';
   },
-  isDefaultConfiguration: function() {
-    return Cookies.get('default-configuration') == 'true';
-  },
   isAnyConfiguration: function() {
     return Cookies.get('default-configuration') !== undefined;
+  },
+  shouldSort: function() {
+    return Cookies.get('sorting') !== 'no-sorting';
+  },
+  isAZSort: function() {
+    return Cookies.get('sorting') === 'a-z';
   }
 }
 
