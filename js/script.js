@@ -111,6 +111,12 @@ ui = {
       });
     });
 
+    $(document).on('click', '.cookies', function() {
+      $('.cookies-info').animate({
+        height: 'toggle'
+      });
+    });
+
     $(document).on('click', '.expand-all', function() {
       $('.card').find('ul').animate({
         height: 'show'
@@ -139,6 +145,10 @@ ui = {
       });
     }
 
+    $(document).on('click', '#close-cookies-info', function() {
+      ui.hideCookiesInfo();
+    });
+
     $(document).on('click', '#save-config', function() {
       config.save();
       ui.hideConfiguration();
@@ -163,11 +173,15 @@ ui = {
       height: 'hide'
     });
   },
+  hideCookiesInfo: function() {
+    $('.cookies-info').animate({
+      height: 'hide'
+    });
+  },
   refreshConfig: function() {
     $('#general-folder-name').val(Cookies.get('general-folder-name'));
     $('#folder-splitter').val(Cookies.get('folder-splitter'));
     // TODO $('#display-data-way').val(Cookies.set('display-data-way'));
-    $('#night-theme').prop('checked', (Cookies.get('night-theme') == 'true'));
     $('#track-badges').prop('checked', (Cookies.get('track-badges') == 'true'));
   },
   displayResult: function(folders) {
@@ -231,18 +245,28 @@ utils = {
 
 config = {
   save: function() {
-    Cookies.set('general-folder-name', $('#general-folder-name').val());
-    Cookies.set('folder-splitter', $('#folder-splitter').val());
-    Cookies.set('display-data-way', $('#display-data-way').val());
-    Cookies.set('night-theme', $('#night-theme').is(":checked"));
-    Cookies.set('track-badges', $('#track-badges').is(":checked"));
+    var generalFolderName = $('#general-folder-name').val();
+    var folderSplitter = $('#folder-splitter').val();
+    var displayDataWay = $('#display-data-way').val();
+    var trackBadges = $('#track-badges').is(":checked");
+    if (generalFolderName === '') {
+      Cookies.set('general-folder-name', 'General');
+    } else {
+      Cookies.set('general-folder-name', generalFolderName);
+    }
+
+    if (folderSplitter === '') {
+      Cookies.set('folder-splitter', '::');
+    } else {
+      Cookies.set('folder-splitter', folderSplitter);
+    }
+    Cookies.set('display-data-way', displayDataWay);
+    Cookies.set('track-badges', trackBadges);
     Cookies.set('default-configuration', false);
   },
   default: function() {
     Cookies.set('general-folder-name', 'General');
-    Cookies.set('folder-splitter', '::');
     Cookies.set('display-data-way', 'TODO');
-    Cookies.set('night-theme', false);
     Cookies.set('track-badges', true);
     Cookies.set('default-configuration', true);
   },
@@ -254,9 +278,6 @@ config = {
   },
   getDisplayDataWay: function() {
     return Cookies.get('display-data-way');
-  },
-  isNightTheme: function() {
-    return Cookies.get('night-theme') == 'true';
   },
   isTrackBadges: function() {
     return Cookies.get('track-badges') == 'true';
@@ -388,6 +409,7 @@ function populateTracksFromResponse(folders, playlists, response) {
 
   ui.initBasicAnimation();
   ui.refreshConfig();
+
   var accessToken = utils.getAccessTokenFromURL();
 
   if (accessToken !== undefined) {

@@ -16,7 +16,7 @@
 	<nav id="top-bar">
 		<div class="nav-wrapper">
 			<div class="container">
-				<img class="brand-logo left" src="img/logo_spv.png" height="200" width="200" /> <i class="material-icons right settings">settings</i>
+				<img class="brand-logo left" src="img/logo_spv.png" height="200" width="200" /> <i title="Settings" class="material-icons right settings">settings</i> <i title="Cookies" class="material-icons right cookies">extension</i>
 			</div>
 		</div>
 	</nav>
@@ -26,11 +26,33 @@
 			Page create by Przemyslaw Paluch (check my code on <a href="https://github.com/palprz/spotify-playlist-viewer">GitHub!</a>)
 		</p>
 
+		<div class="cookies-info card">
+			<div class="row">
+				<form class="col s12">
+					<div class="col s12">
+						<h5>Cookies info</h5>
+						<p>This page is using cookies to store details about settings which you set. Cookies are <b>not</b> storing personal details from login or any additional details. The page will <b>not</b> working correct if you will disable cookies.</p>
+						<p>If you would like to know more about cookies, here is a link with more details: <a href="http://www.whatarecookies.com/">http://www.whatarecookies.com/</a></p>
+						<p>This info about cookies is always available to see (you have button at the top-right).</p>
+					</div>
+				</form>
+			</div>
+			<div class="row">
+				<form class="col s12">
+					<div class="col s4">
+						<a id="close-cookies-info" class="left waves-effect waves-light btn">Close info</a>
+					</div>
+				</form>
+			</div>
+		</div>
+
 		<div class="configuration card">
 			<div class="row">
 				<form class="col s12">
-					<div class="input-field col s12">
-						TODO info about config (cannot be add empty value) TODO validation
+					<div class="col s12">
+						<h5>Settings</h5>
+						<p>If you will leave empty value in the option, the configuration will set the default value.</p>
+						<p>You will need to refresh the page to see saved changes.</p>
 					</div>
 				</form>
 			</div>
@@ -39,25 +61,8 @@
 					<div class="input-field col s6">
 						<input id="general-folder-name" type="text"> <label>Name of general folder (default: 'General')</label>
 					</div>
-					<div class="col s6">
-						<label>Display night theme (default: 'no')</label>
-						<div class="switch">
-							<label>No <input id="night-theme" type="checkbox"> <span class="lever"></span> Yes</label>
-						</div>
-						TODO add night theme + use this config
-					</div>
-				</form>
-			</div>
-			<div class="row">
-				<form class="col s12">
-					<div class="input-field col s6">
+					<div class="input-field  col s6">
 						<input id="folder-splitter" type="text"> <label>Folder splitter (default: '::')</label>
-					</div>
-					<div class="col s6">
-						<label>Display info about tracks for folders, artists and albums (default: 'yes')</label>
-						<div class="switch">
-							<label>No <input id="track-badges" type="checkbox"> <span class="lever"></span> Yes</label>
-						</div>
 					</div>
 				</form>
 			</div>
@@ -65,14 +70,38 @@
 				<form class="col s12">
 					<div class="input-field col s6">
 						<select id="display-data-way">
-									<option value="1">TODO way 1</option>
-									<option value="2">TODO way 2</option>
-									<option value="3">TODO way 3</option>
-						</select>
-						<label>TODO Way of showing playlists</label>
+						<option value="1">TODO folder > artist > album > track</option>
+						<option value="2">TODO folder > artist > track</option>
+						<option value="3">TODO folder > album > track</option>
+						<option value="4">TODO folder > track</option>
+					</select>
+						<label>TODO Way of showing playlists (default: 'folder > artist > album > track')</label>
+					</div>
+					<div class="input-field col s6">
+						<select id="max-extend-list">
+								<option value="1">TODO artist</option>
+								<option value="2">TODO album</option>
+								<option value="3">TODO track</option>
+							</select>
+						<label>TODO Max extend list (default: 'track')</label>
+					</div>
+				</form>
+			</div>
+			<div class="row">
+				<form class="col s12">
+					<div class="input-field col s6">
+						<select id="sorting">
+									<option value="a-z">TODO a-z</option>
+									<option value="z-a">TODO z-a</option>
+									<option value="no-sorting">TODO no sorting</option>
+								</select>
+						<label>TODO Sorting (default: 'a-z')</label>
 					</div>
 					<div class="col s6">
-						TODO add default and cancel buttons
+						<label>Display info about tracks for folders, artists and albums (default: 'yes') TODO change this to have always/mouse over/never</label>
+						<div class="switch">
+							<label>No <input id="track-badges" type="checkbox"> <span class="lever"></span> Yes</label>
+						</div>
 					</div>
 				</form>
 			</div>
@@ -94,8 +123,6 @@
 		<div class="utils">
 			<i class="expand-all material-icons">expand_more</i> <i class="collapse-all material-icons">expand_less</i>
 		</div>
-
-		<!-- 		<i class="material-icons">error_outline</i> -->
 
 		<a id="login" class="waves-effect waves-light btn"><i class="material-icons left">fingerprint</i>Login</a>
 

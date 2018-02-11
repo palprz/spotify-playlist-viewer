@@ -55,6 +55,7 @@
 
 #result ul ul ul .badge {
   background-color: #b9f6ca;
+  color: #000;
 }
 
 #result ul i {
@@ -90,7 +91,7 @@
   height: 120px;
 }
 
-#top-bar .settings:hover {
+#top-bar .cookies:hover, #top-bar .settings:hover {
   cursor: pointer;
 }
 
@@ -98,11 +99,11 @@
   top: -40px;
 }
 
-.configuration {
+.cookies-info, .configuration {
   display: none;
 }
 
-.configuration .row {
+.cookies-info .row, .configuration .row {
   padding: 1em 0;
   margin-bottom: 0;
 }
