@@ -13,7 +13,7 @@ TODO
 - JavaScript (ES6)
 
 ## Features
-- Display artists, albums and tracks you have in all yur playlists
+- Display artists, albums and tracks you have in all your playlists
 - All artists, albums and tracks contain link to your Spotify application. Unfortunately javascript can only open element, but cannot run it.
 - Creating folders by using splitters in the name of playlists on Spotify (by default is '::'). Example: 'party::Ariana Grande'
 - Display all artists, albums and tracks without order and with A-Z or Z-A order

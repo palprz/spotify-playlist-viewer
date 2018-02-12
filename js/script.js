@@ -203,10 +203,16 @@ ui = {
     });
   },
   refreshConfig: function() {
-    //TODO add other configs
     $('#general-folder-name').val(Cookies.get('general-folder-name'));
     $('#folder-splitter').val(Cookies.get('folder-splitter'));
-    // TODO $('#display-data-way').val(Cookies.set('display-data-way'));
+    $('#display-data-way').val(Cookies.get('display-data-way'));
+    $('#max-extend-list').val(Cookies.get('max-extend-list'));
+    $('#sorting').val(Cookies.get('sorting'));
+    $('#track-badges').val(Cookies.get('track-badges'));
+    // It's weird logic for materialize framework - I need to init once again to
+    // update details which I put into select:
+    // http://materializecss.com/forms.html#select-initialization
+    $('select').material_select();
   },
   displayTrackBadges: function() {
     var displayTrackBadges = config.getDisplayTrackBadges();
@@ -215,7 +221,7 @@ ui = {
       return;
     }
 
-    if (displayTrackBadges = 'never') {
+    if (displayTrackBadges === 'never') {
       $('#result').find('.badge').css('display', 'none');
       return;
     }
@@ -307,9 +313,9 @@ config = {
     var generalFolderName = $('#general-folder-name').val();
     var folderSplitter = $('#folder-splitter').val();
     var displayDataWay = $('#display-data-way').val();
-    var trackBadges = $('#track-badges').val();
-    var maxExtendList = $('#max-extend-list').val();
     var sorting = $('#sorting').val();
+    var maxExtendList = $('#max-extend-list').val();
+    var trackBadges = $('#track-badges').val();
 
     if (generalFolderName === '') {
       Cookies.set('general-folder-name', 'General');
@@ -323,18 +329,19 @@ config = {
       Cookies.set('folder-splitter', folderSplitter);
     }
     Cookies.set('display-data-way', displayDataWay);
-    Cookies.set('track-badges', trackBadges);
-    Cookies.set('default-configuration', false);
     Cookies.set('max-extend-list', maxExtendList);
     Cookies.set('sorting', sorting);
+    Cookies.set('track-badges', trackBadges);
+    Cookies.set('default-configuration', false);
   },
   default: function() {
     Cookies.set('general-folder-name', 'General');
+    Cookies.set('folder-splitter', '::');
     Cookies.set('display-data-way', 'TODO');
-    Cookies.set('track-badges', 'mouse-over');
-    Cookies.set('default-configuration', true);
     Cookies.set('max-extend-list', 'track');
     Cookies.set('sorting', 'a-z');
+    Cookies.set('track-badges', 'mouse-over');
+    Cookies.set('default-configuration', true);
   },
   getGeneralFolderName: function() {
     return Cookies.get('general-folder-name');
