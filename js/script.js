@@ -249,15 +249,23 @@ ui = {
     folders.forEach(function(folder) {
       html += '<li><i class="expand-collapse material-icons">expand_less</i><span>' + folder.name + '</span><span class="new badge" data-badge-caption="track(s)">' + folder.trackCount + '</span><ul>';
       folder.artists.forEach(function(artist) {
-        html += '<li><i class="expand-collapse material-icons">expand_less</i><span><a href="spotify:artist:' + artist.id + '">' + artist.name + '</a></span><span class="new badge" data-badge-caption="track(s)">' + artist.trackCount + '</span><ul>';
+        if (!config.shouldUseArtistPlaceholder()) {
+          html += '<li><i class="expand-collapse material-icons">expand_less</i><span><a href="spotify:artist:' + artist.id + '">' + artist.name + '</a></span><span class="new badge" data-badge-caption="track(s)">' + artist.trackCount + '</span><ul>';
+        }
         artist.albums.forEach(function(album) {
-          html += '<li><i class="expand-collapse material-icons">expand_less</i><span><a href="spotify:album:' + album.id + '">' + album.name + '</a></span><span class="new badge" data-badge-caption="track(s)">' + album.trackCount + '</span><ul>';
+          if (!config.shouldUseAlbumPlaceholder()) {
+            html += '<li><i class="expand-collapse material-icons">expand_less</i><span><a href="spotify:album:' + album.id + '">' + album.name + '</a></span><span class="new badge" data-badge-caption="track(s)">' + album.trackCount + '</span><ul>';
+          }
           album.tracks.forEach(function(track) {
             html += '<li><span><a href="spotify:track:' + track.id + '">' + track.name + '</a></span></li>';
           });
-          html += '</ul></li>';
+          if (!config.shouldUseAlbumPlaceholder()) {
+            html += '</ul></li>';
+          }
         });
-        html += '</ul></li>';
+        if (!config.shouldUseArtistPlaceholder()) {
+          html += '</ul></li>';
+        }
       });
       html += '</li></ul>';
     });
@@ -300,7 +308,7 @@ utils = {
 
     return accessToken;
   },
-  convertResponsesToArray: function (responses) {
+  convertResponsesToArray: function(responses) {
     var arr = [];
     for (var i = 0; i < responses.length; i++) {
       arr.push(...responses[i].items);
@@ -375,6 +383,16 @@ config = {
   },
   isAZSort: function() {
     return Cookies.get('sorting') === 'a-z';
+  },
+  shouldUseArtistPlaceholder: function() {
+    var option3 = config.getDisplayDataWay() === 'folder-album-track';
+    var option4 = config.getDisplayDataWay() === 'folder-track';
+    return option3 || option4;
+  },
+  shouldUseAlbumPlaceholder: function() {
+    var option2 = config.getDisplayDataWay() === 'folder-artist-track';
+    var option4 = config.getDisplayDataWay() === 'folder-track';
+    return option2 || option4;
   }
 }
 
@@ -458,11 +476,11 @@ function populateTracksFromResponse(folders, playlists, response) {
     folder.trackCount += response[i].length;
 
     response[i].forEach(function(item) {
-      var artistId = item.track.artists[0].id;
-      var artistName = item.track.artists[0].name;
+      var artistId = config.shouldUseArtistPlaceholder() ? "none" : item.track.artists[0].id;
+      var artistName = config.shouldUseArtistPlaceholder() ? "none" : item.track.artists[0].name;
 
-      var albumId = item.track.album.id;
-      var albumName = item.track.album.name;
+      var albumId = config.shouldUseAlbumPlaceholder() ? "none" : item.track.album.id;
+      var albumName = config.shouldUseAlbumPlaceholder() ? "none" : item.track.album.name;
 
       var trackId = item.track.id;
       var trackName = item.track.name;
