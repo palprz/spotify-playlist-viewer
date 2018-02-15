@@ -52,6 +52,10 @@ api = {
     var playlistsResponse = await api.getAPIResponse('https://api.spotify.com/v1/me/playlists?limit=50&offset=' + offset, accessToken);
     return playlistsResponse;
   },
+  getTracks: async function(accessToken, offset, userId, playlistKey) {
+    var tracksResponse = await api.getAPIResponse('https://api.spotify.com/v1/users/' + userId + '/playlists/' + playlistKey + '/tracks?limit=100&offset=' + offset, accessToken);
+    return tracksResponse;
+  },
   getUserId: async function(accessToken) {
     var userResponse = await api.getAPIResponse('https://api.spotify.com/v1/me', accessToken);
     return userResponse.id;
@@ -295,6 +299,14 @@ utils = {
     }
 
     return accessToken;
+  },
+  convertResponsesToArray: function (responses) {
+    var arr = [];
+    for (var i = 0; i < responses.length; i++) {
+      arr.push(...responses[i].items);
+    }
+
+    return arr;
   }
 }
 
@@ -371,6 +383,10 @@ check = {
   containsMaxPlaylists: function(response) {
     return response.items.length === 50;
   },
+  //100 is a max number of tracks which response can have.
+  containsMaxTracks: function(response) {
+    return response.items.length === 100;
+  },
   hasPlaylistSeparator: function(playlist) {
     return playlist.name.includes(config.getFolderSplitter());
   },
@@ -386,25 +402,33 @@ check = {
 }
 
 async function getAllPlaylists(accessToken) {
-  var isSomethingLeft = true;
   var offset = 0;
-  var playlistItems = [];
-  while (isSomethingLeft) {
+  var playlistResponses = [];
+  while (true) {
     var response = await api.getPlaylists(accessToken, offset);
-    playlistItems.push(response);
-    if (check.containsMaxPlaylists(response)) {
-      offset += 50;
-    } else {
-      isSomethingLeft = false;
+    playlistResponses.push(response);
+    if (!check.containsMaxPlaylists(response)) {
+      break;
     }
+    offset += 50;
   }
 
-  var playlists = [];
-  for (var i = 0; i < playlistItems.length; i++) {
-    playlists.push(...playlistItems[i].items);
+  return utils.convertResponsesToArray(playlistResponses);
+}
+
+async function getPlaylistTracks(accessToken, userId, playlistKey) {
+  var offset = 0;
+  var trackResponses = [];
+  while (true) {
+    var response = await api.getTracks(accessToken, offset, userId, playlistKey);
+    trackResponses.push(response);
+    if (!check.containsMaxTracks(response)) {
+      break;
+    }
+    offset += 100;
   }
 
-  return playlists;
+  return utils.convertResponsesToArray(trackResponses);
 }
 
 function getCorrectFolder(folders, playlists, i) {
@@ -431,9 +455,9 @@ function populateTracksFromResponse(folders, playlists, response) {
   for (var i = 0; i < response.length; i++) {
 
     var folder = getCorrectFolder(folders, playlists, i);
-    folder.trackCount += response[i].items.length;
+    folder.trackCount += response[i].length;
 
-    response[i].items.forEach(function(item) {
+    response[i].forEach(function(item) {
       var artistId = item.track.artists[0].id;
       var artistName = item.track.artists[0].name;
 
@@ -503,9 +527,8 @@ function populateTracksFromResponse(folders, playlists, response) {
         });
 
         var promises = [];
-        for (var key in mapPlaylists) {
-          var url = 'https://api.spotify.com/v1/users/' + userId + '/playlists/' + key + '/tracks';
-          promises.push(api.getAPIResponse(url, accessToken));
+        for (var playlistKey in mapPlaylists) {
+          promises.push(getPlaylistTracks(accessToken, userId, playlistKey));
         }
 
         Promise.all(promises).then(function() {
@@ -514,6 +537,7 @@ function populateTracksFromResponse(folders, playlists, response) {
           utils.sortFolders(folders);
           ui.displayResult(folders);
         });
+
       });
     });
   } else {
