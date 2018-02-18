@@ -70,14 +70,6 @@
   border-radius: 2px;
 }
 
-.utils i:hover, #result ul i i:hover {
-  margin: 0em 0.5em 0em 0em;
-  cursor: pointer;
-  border: 0.1em solid #69f0ae;
-  transition: 0.1s ease-out;
-  border-radius: 2px;
-}
-
 #login {
   display: block;
   width: 10em;
@@ -109,25 +101,33 @@
   margin-bottom: 0;
 }
 
-.utils {
-  display: none;
-  height: 30px; //TODO soomething better
-}
-
 .badge {
   display: none;
-  margin-top: 1.5em; //TODO still looks terrible... do something with that!
+  margin: 1.5em 0.5em 0 0; //TODO still looks terrible... do something with that!
+}
+
+#go-to-top-btn, #expand-all-btn, #collapse-all-btn {
+  position: fixed;
+  background-color: #00c853;
 }
 
 #go-to-top-btn {
   display: none;
-  position: fixed;
-  bottom: 0.5em;
-  right: 0.5em;
-  background-color: #00c853;
+  bottom: 1.75em;
+  right: 0.25em;
 }
 
-#go-to-top-btn:hover {
+#expand-all-btn {
+  bottom: 0.25em;
+  right: 0.25em;
+}
+
+#collapse-all-btn {
+  bottom: 0.25em;
+  right: 1.5em;
+}
+
+#go-to-top-btn:hover, #expand-all-btn:hover, #collapse-all-btn:hover {
   cursor: pointer;
   background-color: #69f0ae;
 }
