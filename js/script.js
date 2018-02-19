@@ -50,11 +50,11 @@ api = {
   },
   getPlaylists: async function(accessToken, offset) {
     var playlistsResponse = await api.getAPIResponse('https://api.spotify.com/v1/me/playlists?limit=50&offset=' + offset, accessToken);
-    return playlistsResponse;
+    return playlistsResponse.items;
   },
   getTracks: async function(accessToken, offset, userId, playlistKey) {
     var tracksResponse = await api.getAPIResponse('https://api.spotify.com/v1/users/' + userId + '/playlists/' + playlistKey + '/tracks?limit=100&offset=' + offset, accessToken);
-    return tracksResponse;
+    return tracksResponse.items;
   },
   getUserId: async function(accessToken) {
     var userResponse = await api.getAPIResponse('https://api.spotify.com/v1/me', accessToken);
@@ -249,33 +249,36 @@ ui = {
     });
   },
   displayResult: function(folders) {
+    var shouldUseArtistPlaceholder = config.shouldUseArtistPlaceholder();
+    var shouldUseAlbumPlaceholder = config.shouldUseAlbumPlaceholder();
+
     var html = '<ul class="card">';
     folders.forEach(function(folder) {
       html += '<li><i class="expand-collapse material-icons">expand_less</i><span>' + folder.name + '</span><span class="new badge" data-badge-caption="track(s)">' + folder.trackCount + '</span><ul>';
       folder.artists.forEach(function(artist) {
-        if (!config.shouldUseArtistPlaceholder()) {
+        if (!shouldUseArtistPlaceholder) {
           html += '<li><i class="expand-collapse material-icons">expand_less</i><span><a href="spotify:artist:' + artist.id + '">' + artist.name + '</a></span><span class="new badge" data-badge-caption="track(s)">' + artist.trackCount + '</span><ul>';
         }
         artist.albums.forEach(function(album) {
-          if (!config.shouldUseAlbumPlaceholder()) {
+          if (!shouldUseAlbumPlaceholder) {
             html += '<li><i class="expand-collapse material-icons">expand_less</i><span><a href="spotify:album:' + album.id + '">' + album.name + '</a></span><span class="new badge" data-badge-caption="track(s)">' + album.trackCount + '</span><ul>';
           }
           album.tracks.forEach(function(track) {
             html += '<li><span><a href="spotify:track:' + track.id + '">' + track.name + '</a></span></li>';
           });
-          if (!config.shouldUseAlbumPlaceholder()) {
+          if (!shouldUseAlbumPlaceholder) {
             html += '</ul></li>';
           }
         });
-        if (!config.shouldUseArtistPlaceholder()) {
+        if (!shouldUseArtistPlaceholder) {
           html += '</ul></li>';
         }
       });
       html += '</li></ul>';
     });
 
-    ui.displayResultElements();
     $('#result').html(html);
+    ui.displayResultElements();
     ui.showMaxExtendList();
     ui.displayTrackBadges();
   }
@@ -285,20 +288,21 @@ utils = {
   //TODO uh, is there any better way to do this?
   sortFolders: function(folders) {
     if (config.shouldSort()) {
+      var isAZSort = config.isAZSort();
       folders.forEach(function(folder) {
-        folder.artists = utils.sortMapByValue([...folder.artists]);
+        folder.artists = utils.sortMapByValue([...folder.artists], isAZSort);
         folder.artists.forEach(function(artist) {
-          artist.albums = utils.sortMapByValue([...artist.albums]);
+          artist.albums = utils.sortMapByValue([...artist.albums], isAZSort);
           artist.albums.forEach(function(album) {
-            album.tracks = utils.sortMapByValue([...album.tracks]);
+            album.tracks = utils.sortMapByValue([...album.tracks], isAZSort);
           })
         });
       });
     }
   },
-  sortMapByValue: function(array) {
+  sortMapByValue: function(array, isAZSort) {
     var sortedArray = array.sort(function(a, b) {
-      return config.isAZSort() ? a[1].name > b[1].name : a[1].name < b[1].name;
+      return isAZSort ? a[1].name > b[1].name : a[1].name < b[1].name;
     });
 
     return new Map(sortedArray.map(obj => [obj[0], obj[1]]));
@@ -317,7 +321,6 @@ utils = {
     for (var i = 0; i < responses.length; i++) {
       arr.push(...responses[i].items);
     }
-
     return arr;
   }
 }
@@ -402,12 +405,12 @@ config = {
 
 check = {
   //50 is a max number of playlists which response can have.
-  containsMaxPlaylists: function(response) {
-    return response.items.length === 50;
+  containsMaxPlaylists: function(playlists) {
+    return playlists.length === 50;
   },
   //100 is a max number of tracks which response can have.
-  containsMaxTracks: function(response) {
-    return response.items.length === 100;
+  containsMaxTracks: function(tracks) {
+    return tracks.length === 100;
   },
   hasPlaylistSeparator: function(playlist) {
     return playlist.name.includes(config.getFolderSplitter());
@@ -427,30 +430,30 @@ async function getAllPlaylists(accessToken) {
   var offset = 0;
   var playlistResponses = [];
   while (true) {
-    var response = await api.getPlaylists(accessToken, offset);
-    playlistResponses.push(response);
-    if (!check.containsMaxPlaylists(response)) {
+    var playlists = await api.getPlaylists(accessToken, offset);
+    playlistResponses = playlistResponses.concat(playlists);
+    if (!check.containsMaxPlaylists(playlists)) {
       break;
     }
     offset += 50;
   }
 
-  return utils.convertResponsesToArray(playlistResponses);
+  return playlistResponses;
 }
 
 async function getPlaylistTracks(accessToken, userId, playlistKey) {
   var offset = 0;
   var trackResponses = [];
   while (true) {
-    var response = await api.getTracks(accessToken, offset, userId, playlistKey);
-    trackResponses.push(response);
-    if (!check.containsMaxTracks(response)) {
+    var tracks = await api.getTracks(accessToken, offset, userId, playlistKey);
+    playlistResponses = trackResponses.concat(tracks);
+    if (!check.containsMaxTracks(tracks)) {
       break;
     }
     offset += 100;
   }
 
-  return utils.convertResponsesToArray(trackResponses);
+  return playlistResponses;
 }
 
 function getCorrectFolder(folders, playlists, i) {
@@ -474,17 +477,20 @@ function getCorrectFolder(folders, playlists, i) {
 }
 
 function populateTracksFromResponse(folders, playlists, response) {
+  var shouldUseArtistPlaceholder = config.shouldUseArtistPlaceholder();
+  var shouldUseAlbumPlaceholder = config.shouldUseAlbumPlaceholder();
+
   for (var i = 0; i < response.length; i++) {
 
     var folder = getCorrectFolder(folders, playlists, i);
     folder.trackCount += response[i].length;
 
     response[i].forEach(function(item) {
-      var artistId = config.shouldUseArtistPlaceholder() ? "none" : item.track.artists[0].id;
-      var artistName = config.shouldUseArtistPlaceholder() ? "none" : item.track.artists[0].name;
+      var artistId = shouldUseArtistPlaceholder ? "none" : item.track.artists[0].id;
+      var artistName = shouldUseArtistPlaceholder ? "none" : item.track.artists[0].name;
 
-      var albumId = config.shouldUseAlbumPlaceholder() ? "none" : item.track.album.id;
-      var albumName = config.shouldUseAlbumPlaceholder() ? "none" : item.track.album.name;
+      var albumId = shouldUseAlbumPlaceholder ? "none" : item.track.album.id;
+      var albumName = shouldUseAlbumPlaceholder ? "none" : item.track.album.name;
 
       var trackId = item.track.id;
       var trackName = item.track.name;
