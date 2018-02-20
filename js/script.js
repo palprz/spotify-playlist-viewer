@@ -23,7 +23,7 @@ function Track(id, name) {
   this.name = name;
 }
 
-api = {
+var api = {
   login: function() {
     var client_id = 'c676b1cde38a4bf9a725cafebeab4c69';
     var redirect_uri = 'https://rawgit.com/palprz/spotify-playlist-viewer/master/index.html';
@@ -62,7 +62,7 @@ api = {
   }
 }
 
-ui = {
+var ui = {
   displayLoginElements: function() {
     $('.progress').css('display', 'none');
     $('#expand-all-btn').css('display', 'none');
@@ -284,7 +284,7 @@ ui = {
   }
 }
 
-utils = {
+var utils = {
   //TODO uh, is there any better way to do this?
   sortFolders: function(folders) {
     if (config.shouldSort()) {
@@ -315,17 +315,10 @@ utils = {
     }
 
     return accessToken;
-  },
-  convertResponsesToArray: function(responses) {
-    var arr = [];
-    for (var i = 0; i < responses.length; i++) {
-      arr.push(...responses[i].items);
-    }
-    return arr;
   }
 }
 
-config = {
+var config = {
   saveWithRefresh: function() {
     config.save();
     //Wait just in case
@@ -403,7 +396,7 @@ config = {
   }
 }
 
-check = {
+var check = {
   //50 is a max number of playlists which response can have.
   containsMaxPlaylists: function(playlists) {
     return playlists.length === 50;
@@ -446,14 +439,14 @@ async function getPlaylistTracks(accessToken, userId, playlistKey) {
   var trackResponses = [];
   while (true) {
     var tracks = await api.getTracks(accessToken, offset, userId, playlistKey);
-    playlistResponses = trackResponses.concat(tracks);
+    trackResponses = trackResponses.concat(tracks);
     if (!check.containsMaxTracks(tracks)) {
       break;
     }
     offset += 100;
   }
 
-  return playlistResponses;
+  return trackResponses;
 }
 
 function getCorrectFolder(folders, playlists, i) {
@@ -520,7 +513,7 @@ function populateTracksFromResponse(folders, playlists, response) {
         map.set(trackId, track);
         var album = new Album(albumId, albumName, map);
 
-        var map = new Map();
+        map = new Map();
         map.set(albumId, album);
         var artist = new Artist(artistId, artistName, map);
         artist.trackCount += 1;
@@ -549,15 +542,10 @@ function populateTracksFromResponse(folders, playlists, response) {
 
     api.getUserId(accessToken).then(function(userId) {
       getAllPlaylists(accessToken).then(function(playlists) {
-        var mapPlaylists = {};
-        playlists.forEach(function(playlist) {
-          mapPlaylists[playlist.id] = playlist.name;
-        });
-
         var promises = [];
-        for (var playlistKey in mapPlaylists) {
-          promises.push(getPlaylistTracks(accessToken, userId, playlistKey));
-        }
+        playlists.forEach(function(playlist) {
+          promises.push(getPlaylistTracks(accessToken, userId, playlist.id));
+        });
 
         Promise.all(promises).then(function() {
           populateTracksFromResponse(folders, playlists, arguments[0]);
