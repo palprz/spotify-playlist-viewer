@@ -526,6 +526,9 @@ function populateTracksFromResponse(folders, playlists, response) {
 (function() {
   if (!config.isAnyConfiguration()) {
     config.default();
+    $('.cookies-info').css('display','block');
+  } else {
+    $('.cookies-info').css('display','none');
   }
 
   ui.initBasicAnimation();
