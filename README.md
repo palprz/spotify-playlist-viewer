@@ -4,8 +4,10 @@
 Simple web application for displaying playlists in different way than Spotify.
 If you found any issue, please let me know by adding it here with step to reproduce and description: https://github.com/palprz/spotify-playlist-viewer/issues
 
-## Link to the application
-https://rawgit.com/palprz/spotify-playlist-viewer/master/index.html
+## Link to demo of application
+Can take 30 seconds to run application on Heroku (sorry, free version got some disadvantage!):
+
+https://spotify-playlist-viewer.herokuapp.com/
 
 ## Technologies
 - HTML 5
