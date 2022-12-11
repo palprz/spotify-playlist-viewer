@@ -1,13 +1,17 @@
 ![Super logo of Spotify Playlist Viewer](https://raw.githubusercontent.com/palprz/spotify-playlist-viewer/master/img/logo_spv.png)
-# Spotify Playlist Viewer [January - February 2018]
+# Spotify Playlist Viewer
 
 Simple web application for displaying playlists in different way than Spotify.
-If you found any issue, please let me know by adding it here with step to reproduce and description: https://github.com/palprz/spotify-playlist-viewer/issues
 
-## Link to demo of application
-Can take 30 seconds to run application on Heroku (sorry, free version got some disadvantage!):
+## Screens from running application
+General view:
+![General view screenshot](https://raw.githubusercontent.com/palprz/spotify-playlist-viewer/master/img/general_doc.png)
 
-https://spotify-playlist-viewer.herokuapp.com/
+Configuration:
+![Configuration screenshot](https://raw.githubusercontent.com/palprz/spotify-playlist-viewer/master/img/configuration_doc.png)
+
+Typical usage:
+![Typical usage screenshot](https://raw.githubusercontent.com/palprz/spotify-playlist-viewer/master/img/typical_usage_doc.png)
 
 ## Technologies
 - HTML 5
@@ -39,13 +43,3 @@ https://spotify-playlist-viewer.herokuapp.com/
 | Max extend list with elements   | folder<br/>artist<br/>album<br/>track           | track  |
 | Sorting                         | a-z<br/>z-a<br/>no sorting           | a-z  |
 | Display badges                  | always<br/>mouse over<br/>never           | mouse over  |
-
-## Screens from running application
-General view:
-![General view screenshot](https://raw.githubusercontent.com/palprz/spotify-playlist-viewer/master/img/general_doc.png)
-
-Configuration:
-![Configuration screenshot](https://raw.githubusercontent.com/palprz/spotify-playlist-viewer/master/img/configuration_doc.png)
-
-Typical usage:
-![Typical usage screenshot](https://raw.githubusercontent.com/palprz/spotify-playlist-viewer/master/img/typical_usage_doc.png)
