@@ -5,12 +5,15 @@ Simple web application for displaying playlists in different way than Spotify.
 
 ## Screens from running application
 General view:
+
 ![General view screenshot](https://raw.githubusercontent.com/palprz/spotify-playlist-viewer/master/img/general_doc.png)
 
 Configuration:
+
 ![Configuration screenshot](https://raw.githubusercontent.com/palprz/spotify-playlist-viewer/master/img/configuration_doc.png)
 
 Typical usage:
+
 ![Typical usage screenshot](https://raw.githubusercontent.com/palprz/spotify-playlist-viewer/master/img/typical_usage_doc.png)
 
 ## Technologies
